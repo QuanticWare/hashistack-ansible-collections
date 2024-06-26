@@ -3,7 +3,7 @@
 
 - name: "Nomad | Nomad ACL | Create Nomad policy for single mode install operations (drain)"
   ansible.builtin.import_role:
-    name: "quanticware.nomad.operate"
+    name: "hashistack.nomad.operate"
     tasks_from: policy_create
   vars:
     nomad_policy_name: "nomad-policy-autoeligibility"
@@ -12,7 +12,7 @@
 
 - name: "Nomad | Nomad Token | Create Nomad token for single mode install operations (drain)"
   ansible.builtin.import_role:
-    name: "quanticware.nomad.operate"
+    name: "hashistack.nomad.operate"
     tasks_from: token_create
   vars:
     nomad_token_name: "autoeligibility"

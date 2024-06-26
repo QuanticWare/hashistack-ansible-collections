@@ -2,7 +2,7 @@
 - block:
     - name: "Nomad | Consul ACL | Create Consul policy for Nomad"
       ansible.builtin.import_role:
-        name: "quanticware.consul.operate"
+        name: "hashistack.consul.operate"
         tasks_from: policy_create
       vars:
         consul_policy_name: nomad-agents
@@ -12,7 +12,7 @@
 
     - name: "Nomad | Consul Token | Create Consul token for Nomad"
       ansible.builtin.import_role:
-        name: "quanticware.consul.operate"
+        name: "hashistack.consul.operate"
         tasks_from: token_create
       vars:
         consul_token_name: "nomad"
@@ -226,7 +226,7 @@
 
 - name: "Nomad | Auto Eligibility | Install"
   ansible.builtin.import_role:
-    name: "quanticware.nomad.autoeligibility"
+    name: "hashistack.nomad.autoeligibility"
   when:
   - nomad_acl == true
   - ansible_local.nomad_autoeligibility_token.nomad_autoeligibility_token is not defined

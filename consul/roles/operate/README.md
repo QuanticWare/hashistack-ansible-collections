@@ -31,7 +31,7 @@ For create policy
   tasks:
     - name: "Create Consul policy"
       ansible.builtin.import_role:
-        name: "quanticware.consul.operate"
+        name: "hashistack.consul.operate"
         tasks_from: policy_create
       vars:
         consul_token_name: "example-service"
@@ -48,7 +48,7 @@ For create token
   tasks:
     - name: "Create Consul token"
       ansible.builtin.import_role:
-        name: "quanticware.consul.operate"
+        name: "hashistack.consul.operate"
         tasks_from: token_create
       vars:
         consul_token_name: "example-service"

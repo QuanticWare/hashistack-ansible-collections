@@ -1,7 +1,7 @@
 - block:
     - name: "Nomad | Consul ACL | Create Consul policy for Vault"
       ansible.builtin.import_role:
-        name: "quanticware.consul.operate"
+        name: "hashistack.consul.operate"
         tasks_from: policy_create
       vars:
         consul_policy_name: nomad-service
@@ -9,7 +9,7 @@
 
     - name: "Nomad | Consul Token | Create Consul token for Vault"
       ansible.builtin.import_role:
-        name: "quanticware.consul.operate"
+        name: "hashistack.consul.operate"
         tasks_from: token_create
       vars:
         consul_token_name: "nomad"

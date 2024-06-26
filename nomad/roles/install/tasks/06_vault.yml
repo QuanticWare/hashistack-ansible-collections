@@ -3,7 +3,7 @@
 - block:
     - name: "Nomad | Vault Policies | Create Policy for Nomad-Server"
       ansible.builtin.import_role:
-        name: "quanticware.vault.operate"
+        name: "hashistack.vault.operate"
         tasks_from: policy_create
       vars:
         vault_policy_name: "nomad-server"
@@ -11,7 +11,7 @@
 
     - name: "Nomad | Vault Policies | Create Policy for access-creds"
       ansible.builtin.import_role:
-        name: "quanticware.vault.operate"
+        name: "hashistack.vault.operate"
         tasks_from: policy_create
       vars:
         vault_policy_name: "access-creds"
@@ -19,7 +19,7 @@
 
     - name: "Nomad | Vault Policies | Create Roles for Nomad-Cluster"
       ansible.builtin.import_role:
-        name: "quanticware.vault.operate"
+        name: "hashistack.vault.operate"
         tasks_from: role_create
       vars:
         vault_role_name: "nomad-cluster"
@@ -27,7 +27,7 @@
 
     - name: "Nomad | Vault Token | Create Vault Token for Nomad"
       ansible.builtin.import_role:
-        name: "quanticware.vault.operate"
+        name: "hashistack.vault.operate"
         tasks_from: token_create
       vars:
         vault_policies:
