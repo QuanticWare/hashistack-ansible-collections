@@ -28,7 +28,7 @@
 
 - name: "Nomad | Create a Consul ACL binding rule for Nomad services"
   ansible.builtin.import_role:
-    name: "quanticware.consul.operate"
+    name: "hashistack.consul.operate"
     tasks_from: binding_create
   vars:
     consul_binding_method: "{{ nomad_install_backend_consul_binding_nomad_services_name }}"
@@ -39,7 +39,7 @@
 
 - name: "Nomad | Create a Consul ACL binding rule for Nomad tasks"
   ansible.builtin.import_role:
-    name: "quanticware.consul.operate"
+    name: "hashistack.consul.operate"
     tasks_from: binding_create
   vars:
     consul_binding_method: "{{ nomad_install_backend_consul_binding_nomad_tasks_name }}"
@@ -50,7 +50,7 @@
 
 - name: "Nomad | Consul ACL | Create a Consul ACL policy for Nomad tasks"
   ansible.builtin.import_role:
-    name: "quanticware.consul.operate"
+    name: "hashistack.consul.operate"
     tasks_from: policy_create
   vars:
     consul_policy_name: "{{ nomad_install_backend_consul_policy_nomad_tasks_name }}"
@@ -59,7 +59,7 @@
 
 - name: "Nomad | Create a Consul ACL role for Nomad tasks"
   ansible.builtin.import_role:
-    name: "quanticware.consul.operate"
+    name: "hashistack.consul.operate"
     tasks_from: role_create
   vars:
     consul_role_name: "{{ nomad_install_backend_consul_role_nomad_tasks_name }}"

@@ -2,7 +2,7 @@
 - name: "Vault | Generate CA Cert"
   ansible.builtin.import_role:
     name: hashistack.hashistack.install
-    tasks_from: 02_ca_cert
+    tasks_from: 03_ca_cert
   run_once: true
 
 - name: "Vault | TLS CA Configuration"

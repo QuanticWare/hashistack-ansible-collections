@@ -4,7 +4,7 @@
 
 - name: "Consul ACL | Create Consul policy"
   ansible.builtin.import_role:
-    name: "quanticware.consul.operate"
+    name: "hashistack.consul.operate"
     tasks_from: create_policy
   vars:
     consul_policy_name: agent-service
@@ -12,7 +12,7 @@
 
 - name: "Consul Token |  Create Consul token"
   ansible.builtin.import_role:
-    name: "quanticware.consul.operate"
+    name: "hashistack.consul.operate"
     tasks_from: create_token
   vars:
     consul_token_name: "agent"
