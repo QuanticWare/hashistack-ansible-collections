@@ -146,6 +146,8 @@ nomad_install_client_host_network_list:
 - { name: "cluster", interface: "{{ nomad_install_cluster_bridge | default(ansible_default_ipv4.interface) }}" }
 - { name: "private", interface: "{{ nomad_install_bridge_list | map(attribute='name') | first }}" }
 
+nomad_install_client_meta_list: {}
+
 nomad_install_server_join: "{% if nomad_install_mode == 'single' %}127.0.0.1{% else %}{{ ( groups[nomad_deploy_cluster_name] | map('extract', hostvars) | selectattr('nomad_node_role', 'equalto', 'both') | map(attribute='ansible_br0.ipv4.address') ) or ( groups[nomad_deploy_cluster_name] | map('extract', hostvars) | selectattr('nomad_node_role', 'equalto', 'both') | map(attribute='ansible_br0.ipv4.address') ) | unique | list }}{% endif %}"
 nomad_install_server_join_retry_max: 3
 nomad_install_server_join_retry_interval: "15s"

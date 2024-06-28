@@ -23,7 +23,13 @@ client {
     }
 
 {% endfor %}
-
+{% if nomad_install_client_meta_list%}
+    meta = {
+    {% for key, value in nomad_install_client_meta_list.items() %}
+    "{{ key }}" = "{{ value }}"
+    {% endfor -%}
+    }
+{% endif %}
 
 {% if nomad_install_mode == 'cluster' %}
     drain_on_shutdown {
