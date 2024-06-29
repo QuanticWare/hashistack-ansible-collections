@@ -3,16 +3,16 @@
   ansible.builtin.import_role:
     name: hashistack.consul.operate
     tasks_from: upgrade
-  when: consul_upgrade == True
+  when: consul_upgrade
 
 - name: Upgrade Consul
   ansible.builtin.import_role:
     name: hashistack.vault.operate
     tasks_from: upgrade
-  when: vault_upgrade == True
+  when: vault_upgrade
 
 - name: Upgrade Nomad
   ansible.builtin.import_role:
     name: hashistack.nomad.operate
     tasks_from: upgrade
-  when: nomad_upgrade == True
+  when: nomad_upgrade
