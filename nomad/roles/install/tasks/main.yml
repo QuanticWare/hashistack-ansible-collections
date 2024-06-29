@@ -4,8 +4,6 @@
 - name: "Nomad | Install Docker"
   ansible.builtin.include_role:
     name: hashistack.docker.install
-  vars:
-    docker_private_registry_state: false
   when:
   - nomad_node_role == 'client' or nomad_node_role == 'both'
   - nomad_docker_driver == true

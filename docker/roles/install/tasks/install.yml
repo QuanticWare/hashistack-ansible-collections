@@ -65,3 +65,12 @@
     state: started
     name: docker
     enabled: yes
+
+- name: "Docker Install | Copy config.json"
+  ansible.builtin.template:
+    src: config.json
+    dest: "{{ docker_private_registry_config }}"
+    owner: root
+    group: root
+    mode: '0600'
+  when: docker_private_registry_state
