@@ -1,2 +1,7 @@
 ---
 # handlers file for deploy
+
+- name: Consul_restart
+  ansible.builtin.systemd_service:
+    name: consul
+    state: restarted
