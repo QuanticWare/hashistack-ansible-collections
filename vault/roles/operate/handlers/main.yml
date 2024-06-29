@@ -1,7 +1,7 @@
 ---
 # handlers file for operate
 
-- name: nomad_restart
+- name: Vault_restart
   ansible.builtin.systemd_service:
-    name: nomad
+    name: vault
     state: restarted
