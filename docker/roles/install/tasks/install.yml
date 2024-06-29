@@ -60,14 +60,6 @@
     groups: docker
     append: yes
 
-- name: "Docker Install | Log into private registry and force re-authorization"
-  community.docker.docker_login:
-    registry_url: "{{ docker_private_registry_url }}"
-    username: "{{ docker_private_registry_username }}"
-    password: "{{ docker_private_registry_password }}"
-    reauthorize: true
-  when: docker_private_registry_state == true
-
 - name: "Docker Install | Systemd start and enable"
   ansible.builtin.systemd:
     state: started

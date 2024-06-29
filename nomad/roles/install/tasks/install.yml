@@ -37,14 +37,6 @@
       mode: "0600"
   when: ansible_local.nomad_encrypt_key.nomad_encrypt_key is not defined
 
-- name: "Nomad Install | Login to docker private registry"
-  community.docker.docker_login:
-    registry_url: "{{ nomad_install_docker_private_registry_url }}"
-    username: "{{ nomad_install_docker_private_registry_username }}"
-    password: "{{ nomad_install_docker_private_registry_password }}"
-    config_path: "{{ nomad_install_docker_private_registry_config }}"
-  when: nomad_install_docker_private_registry_state == true
-
 - name: "Nomad Install | Copy configurations files"
   ansible.builtin.template:
     src: "{{ item.src }}"
