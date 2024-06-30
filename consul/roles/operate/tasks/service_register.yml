@@ -8,6 +8,6 @@
     body_format: json
     body: "{{ lookup('ansible.builtin.template','service_register.json.j2') }}"
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(consul_master_token) }}"
+      X-Consul-Token: "{{ consul_global_management_token | default(consul_master_token) }}"
     status_code:
         - 200

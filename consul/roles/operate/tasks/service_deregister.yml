@@ -6,6 +6,6 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: PUT
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(consul_master_token) }}"
+      X-Consul-Token: "{{ consul_global_management_token | default(consul_master_token) }}"
     status_code:
         - 200
