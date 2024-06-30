@@ -383,10 +383,7 @@ nomad_install_docker_client_allow_caps:
 - sys_admin
 
 nomad_install_docker_private_registry_state: false
-nomad_install_docker_private_registry_url: ""
-nomad_install_docker_private_registry_username: ""
-nomad_install_docker_private_registry_password: ""
-nomad_install_docker_private_registry_config: "{{ nomad_install_data_dir }}/docker_config.json"
+nomad_install_docker_private_registry_config: /etc/docker/config.json
 
 nomad_install_docker_allow_privileged: "false"
 nomad_install_docker_volume_enable: "true"

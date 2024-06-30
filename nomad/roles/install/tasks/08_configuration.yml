@@ -44,14 +44,6 @@
 
 - name: "Nomad Configuration | Docker configuration"
   block:
-    - name: "Nomad Install | Login to docker private registry"
-      community.docker.docker_login:
-        registry_url: "{{ nomad_install_docker_private_registry_url }}"
-        username: "{{ nomad_install_docker_private_registry_username }}"
-        password: "{{ nomad_install_docker_private_registry_password }}"
-        config_path: "{{ nomad_install_docker_private_registry_config }}"
-      when: nomad_install_docker_private_registry_state == true
-
     - name: "Nomad Configuration | Add user nomad to docker group"
       ansible.builtin.user:
         name: "nomad"
