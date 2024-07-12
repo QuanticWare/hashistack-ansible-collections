@@ -4,8 +4,8 @@
 
 - name: "Docker Install | Configure TLS"
   ansible.builtin.include_tasks: tls.yml
-  when: docker_tls_configuration == true
+  when: docker_tls_configuration
 
 - name: "Docker Install | Firewall"
   ansible.builtin.include_tasks: firewall.yml
-  when: firewall == true
+  when: firewall

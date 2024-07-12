@@ -20,12 +20,12 @@
     suites: ["{{ ansible_distribution_release | lower }}"]
     components: [stable]
     state: present
-    enabled: yes
+    enabled: true
   register: docker_add_repo
 
 - name: "Docker Install | Apt Update"
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
   when: docker_add_repo.changed
 
 - name: "Docker Install | Uninstall OS defaults Docker packages"
@@ -58,19 +58,25 @@
   ansible.builtin.user:
     name: "{{ docker_user }}"
     groups: docker
-    append: yes
-
-- name: "Docker Install | Systemd start and enable"
-  ansible.builtin.systemd:
-    state: started
-    name: docker
-    enabled: yes
+    append: true
+  notify: "Docker_restart"
 
 - name: "Docker Install | Copy config.json"
   ansible.builtin.template:
-    src: config.json
+    src: config.json.j2
     dest: "{{ docker_private_registry_config }}"
     owner: root
     group: root
     mode: '0600'
   when: docker_private_registry_state
+  notify: "Docker_restart"
+
+- name: "Docker Install | Copy daemon.json for DNS resolution"
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: "{{ docker_conf_dir }}/daemon.json"
+    owner: root
+    group: root
+    mode: '0600'
+  when: docker_dns_configuration
+  notify: "Docker_restart"
