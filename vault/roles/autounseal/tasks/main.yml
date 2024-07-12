@@ -21,23 +21,11 @@
     group: root
     mode: '0644'
 
-- name: "Vault Unseal | Add vault-unseal.service to Wants of Vault systemd unit file"
+- name: "Vault Unseal | Copy override conf"
   ansible.builtin.lineinfile:
-    path: /lib/systemd/system/vault.service
-    insertafter: 'Requires=network-online.target'
+    path: "/etc/systemd/system/vault.service.d/override.conf"
+    insertafter: '[Unit]'
     line: 'Wants=vault-unseal.service'
-
-- name: "Vault Unseal | Check if Nomad binary exists"
-  ansible.builtin.stat:
-    path: "{{ nomad_binary_path }}"
-  register: nomad_binary
-
-- name: "Vault Unseal | Add vault-unseal.service wait to Nomad the systemd unit file"
-  ansible.builtin.lineinfile:
-    path: /lib/systemd/system/nomad.service
-    insertafter: 'After=consul.service'
-    line: 'After=vault-unseal.service'
-  when: nomad_binary.stat.exists == true
 
 - name: "Vault Unseal | Register systemd service"
   ansible.builtin.systemd_service:
