@@ -1,0 +1,10 @@
+[Resolve]
+DNS={{ consul_dns_ip }}:{{ consul_dns_port }}
+DNSSEC=no
+DNSOverTLS=no
+Domains={{ consul_dns_domain }}
+Cache=no
+DNSStubListener={{ consul_dns_listerner }}
+{% for item in consul_dns_listerner_extra %}
+DNSStubListenerExtra={{ item }}
+{% endfor %}
