@@ -9,6 +9,9 @@ client {
 
     no_host_uuid = {{ nomad_install_client_no_host_uuid }}
 
+    {% if nomad_install_client_network_interface is defined -%}
+    network_interface = "{{ nomad_install_client_network_interface }}"
+    {% endif -%}
 {% for item in nomad_install_client_host_network_list %}
     host_network "{{ item.name }}"  {
 {% if nomad_install_client_host_network_list is defined and item.interface is defined %}
