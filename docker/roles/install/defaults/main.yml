@@ -3,6 +3,9 @@
 
 docker_user: root
 firewall: false
+docker_conf_dir: "/etc/docker"
+
+docker_gateway_ip: 172.17.0.1
 
 docker_tls_configuration: false
 docker_tcp_listen_address: "127.0.0.1"
@@ -13,6 +16,11 @@ docker_private_registry_url: ""
 docker_private_registry_username: ""
 docker_private_registry_password: ""
 docker_private_registry_config: /etc/docker/config.json
+
+# DNS
+docker_dns_configuration: true
+docker_dns_servers:
+ - "{{ docker_gateway_ip }}"
 
 # TLS
 # CA

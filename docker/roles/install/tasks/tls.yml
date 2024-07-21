@@ -9,7 +9,7 @@
     valid_at:
       delay: "{{ docker_server_tls_check_delay }}"
   register: tls_check
-  when: cert_tls_present.stat.exists == true
+  when: cert_tls_present.stat.exists
 
 - name: "Docker TLS | Create CA"
   ansible.builtin.import_role:
@@ -22,8 +22,8 @@
     ca_privatekey: "{{ docker_ca_install_tls_ca_privatekey }}"
     host_certificate_dir: "{{ docker_ca_install_tls_host_certificate_dir }}"
     common_name: "{{ docker_ca_install_tls_common_name }}"
-  when: cert_tls_present.stat.exists == false or
-        (cert_tls_present.stat.exists == true and tls_check.valid_at.delay == false)
+  when: not cert_tls_present.stat.exists or
+        ( cert_tls_present.stat.exists and not tls_check.valid_at.delay )
 
 - name: "Docker TLS | Check if TLS Server cert exists"
   ansible.builtin.stat:
@@ -36,7 +36,7 @@
     valid_at:
       delay: "{{ docker_server_tls_check_delay }}"
   register: tls_check
-  when: cert_tls_present.stat.exists == true
+  when: cert_tls_present.stat.exists
 
 - name: "Docker TLS | Create Server Cert"
   ansible.builtin.import_role:
@@ -53,8 +53,8 @@
     client_privatekey: "{{ docker_server_tls_privatekey }}"
     common_name: "{{ docker_server_tls_common_name }}"
     subject_alt_name: "{{ docker_server_tls_subject_alt_name }}"
-  when: cert_tls_present.stat.exists == false or
-        (cert_tls_present.stat.exists == true and tls_check.valid_at.delay == false)
+  when: not cert_tls_present.stat.exists or
+        ( cert_tls_present.stat.exists and not tls_check.valid_at.delay )
 
 - name: "Docker TLS | Check if TLS Client cert exists"
   ansible.builtin.stat:
@@ -67,7 +67,7 @@
     valid_at:
       delay: "{{ docker_client_tls_check_delay }}"
   register: tls_check
-  when: cert_tls_present.stat.exists == true
+  when: cert_tls_present.stat.exists
 
 - name: "Docker TLS | Create Client Cert"
   ansible.builtin.import_role:
@@ -84,8 +84,8 @@
     client_privatekey: "{{ docker_client_tls_privatekey }}"
     common_name: "{{ docker_client_tls_common_name }}"
     subject_alt_name: "{{ docker_client_tls_subject_alt_name }}"
-  when: cert_tls_present.stat.exists == false or
-        (cert_tls_present.stat.exists == true and tls_check.valid_at.delay == false)
+  when: not cert_tls_present.stat.exists or
+        ( cert_tls_present.stat.exists and not tls_check.valid_at.delay )
 
 - name: "Docker TLS | Create systemd override directory for dockerd"
   ansible.builtin.file:

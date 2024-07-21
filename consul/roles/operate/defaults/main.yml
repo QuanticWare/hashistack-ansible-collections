@@ -19,6 +19,16 @@ consul_path: "{{ binary_path }}"
 
 # hashistack_creds_file: "{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/hashistack.yml"
 
+# DNS (configure systemd-resolved)
+consul_dns_systemd_resolved_conf_dir: "/etc/systemd/resolved.conf.d"
+consul_dns_ip: 127.0.0.1
+consul_dns_port: 8600
+consul_dns_domain: "~consul"
+consul_dns_listerner: "false"
+consul_dns_listerner_extra:
+ - 172.17.0.1
+ - 172.26.64.1
+
 # TLS
 consul_operate_tls_ca_host: localhost
 consul_operate_tls_ca_host_dir: "{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/tls"
