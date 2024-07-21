@@ -40,4 +40,5 @@
   until: consul_acl_agent_status.status | int == 200
   retries: 20
   delay: 5
+  no_log: true
   when: consul_node_role == 'server' or consul_node_role == 'both'

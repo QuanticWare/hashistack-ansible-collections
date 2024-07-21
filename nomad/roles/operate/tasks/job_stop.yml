@@ -1,4 +1,4 @@
-- name: "Nomad operate | Restart job"
+- name: "Nomad operate | Stop job"
   ansible.builtin.shell: "nomad job stop {{ nomad_job_name }}"
   environment:
     NOMAD_ADDR: "{{ nomad_http_scheme }}://{{ nomad_http_ip }}:{{ nomad_http_port }}"

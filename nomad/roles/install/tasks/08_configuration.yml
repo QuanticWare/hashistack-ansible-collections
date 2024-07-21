@@ -130,9 +130,9 @@
     dest: "{{ nomad_config_dir }}/{{ item.dest }}"
     owner: nomad
     group: nomad
-    mode: '0644'
+    mode: "{{ item.mode | default('0644') }}"
   loop:
-  - { src: "nomad.env.j2", dest: "nomad.env" }
+  - { src: "nomad.env.j2", dest: "nomad.env", mode: "0600" }
   - { src: "nomad.hcl.j2", dest: "nomad.hcl" }
   - { src: "consul.hcl.j2", dest: "consul.hcl" }
   - { src: "vault.hcl.j2", dest: "vault.hcl" }

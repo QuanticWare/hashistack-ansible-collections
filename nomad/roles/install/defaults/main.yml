@@ -141,6 +141,8 @@ nomad_install_client_node_pool: "default"
 nomad_install_client_no_host_uuid: "false"
 nomad_install_client_max_kill_timeout: "30s"
 
+nomad_install_client_network_interface: docker0
+
 nomad_install_client_host_network_list:
 - { name: "public", interface: "{{ ansible_default_ipv4.interface }}" }
 - { name: "cluster", interface: "{{ nomad_install_cluster_bridge | default(ansible_default_ipv4.interface) }}" }
