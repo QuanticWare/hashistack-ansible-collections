@@ -44,6 +44,8 @@ log_rotate_bytes = {{ consul_install_log_rotate_bytes }}
 log_rotate_duration = "{{ consul_install_log_rotate_duration }}"
 log_rotate_max_files = {{ consul_install_log_rotate_max_files }}
 
+experiments = [ "v1dns" ]
+
 performance = {
   leave_drain_time = "{{ consul_install_performance_leave_drain_time }}"
   raft_multiplier = {{ consul_install_performance_raft_multiplier }}
