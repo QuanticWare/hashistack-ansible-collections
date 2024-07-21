@@ -26,6 +26,9 @@
         "traefik.http.routers.{{ service_name }}.tls.options=mintls12@file",
         "traefik.http.routers.{{ service_name }}.entrypoints=https",
         "traefik.http.routers.{{ service_name }}.rule=Host(`{{ fqdn }}`{% if domain_alias is defined %},`{{ domain_alias }}`{% endif %})",
+        {% if tls is defined and tls %}
+        "traefik.http.services.{{ service_name }}.loadbalancer.server.scheme=https",
+        {% endif %}
         "traefik.http.middlewares.{{ service_name }}.redirectscheme.scheme=https",
         "traefik.http.middlewares.{{ service_name }}.redirectscheme.permanent=true",
 {% if traefik_noindex == false %}
