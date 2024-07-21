@@ -28,6 +28,7 @@
         body_format: json
         status_code:
             - 200
+      no_log: true
       register: vault_init_result
 
     - ansible.builtin.debug:
@@ -107,6 +108,7 @@
   retries: 20
   delay: 5
   when: vault_init_status.json.initialized == false
+  no_log: true
 
 - name: "Vault Configuration | Check stats of local ansible fact file"
   ansible.builtin.stat:
@@ -172,6 +174,7 @@
   until: (vault_unseal.status | int == 200 or vault_health.status | int == 429)
   retries: 20
   delay: 5
+  no_log: true
 
 - name: "Vault Configuration | Enable usage metrics"
   ansible.builtin.uri:
@@ -195,3 +198,4 @@
   until: vault_enable_stats.status | int == 204
   retries: 20
   delay: 3
+  no_log: true
