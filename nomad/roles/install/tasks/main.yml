@@ -79,3 +79,9 @@
   ansible.builtin.import_role:
     name: hashistack.nomad.autoeligibility
   when: nomad_install_mode == 'single'
+
+- name: "Nomad | Replace systemd custom service file"
+  ansible.builtin.copy:
+    src: "nomad.service"
+    dest: "/usr/lib/systemd/system/nomad.service"
+    mode: '0644'
