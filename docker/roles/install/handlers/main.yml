@@ -2,7 +2,7 @@
 # handlers file for quanticware.docker
 
 - name: Docker_restart
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     state: restarted
     name: docker
     enabled: true
