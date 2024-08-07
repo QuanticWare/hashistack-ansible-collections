@@ -93,6 +93,7 @@ vault_install_tls_disable: "false"
 
 
 # Consul
+vault_install_consul_backend_state: false
 
 vault_install_consul_http_scheme: "{% if vault_tls == true %}https{% else %}http{% endif %}"
 vault_install_consul_http_ip: "127.0.0.1"

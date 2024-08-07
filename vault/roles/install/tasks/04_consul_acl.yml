@@ -5,7 +5,7 @@
         tasks_from: policy_create
       vars:
         consul_policy_name: vault-service
-        consul_policy_rules: 'service \"vault\" {\n \"policy\" = \"write\"\n }'
+        consul_policy_rules: 'service \"vault\" {\n \"policy\" = \"write\"\n }{% if vault_install_consul_backend_state and vault_install_mode == "single" %}key_prefix \"vault/\" {\n \"policy\" = \"write\"\n }\n \n agent_prefix \"\" {\n \"policy\" = \"read\"\n }\n \n session_prefix \"\" {\n \"policy\" = \"write\"\n }\n{% endif %}'
 
     - name: "Vault | Consul Token |  Create Consul token for Vault"
       ansible.builtin.import_role:
