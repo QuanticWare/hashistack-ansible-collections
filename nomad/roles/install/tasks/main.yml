@@ -75,10 +75,13 @@
   ansible.builtin.include_tasks: "12_firewall.yml"
   when: nomad_install_firewall == true
 
-- name: "Nomad | Change SystemD configuration"
-  ansible.builtin.include_tasks: "systemd_tuning.yml"
-
 - name: "Nomad | Install Nomad Auto Eligibility Node"
   ansible.builtin.import_role:
     name: hashistack.nomad.autoeligibility
   when: nomad_install_mode == 'single'
+
+- name: "Nomad | Replace systemd custom service file"
+  ansible.builtin.copy:
+    src: "nomad.service"
+    dest: "/usr/lib/systemd/system/nomad.service"
+    mode: '0644'

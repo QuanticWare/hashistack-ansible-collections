@@ -1,6 +1,6 @@
 - name: "Consul Operate | DNS Resolution | Create default directory"
   ansible.builtin.file:
-    path: /etc/systemd/resolved.conf.d
+    path: "{{ consul_dns_systemd_resolved_conf_dir }}"
     state: directory
     mode: '0755'
 

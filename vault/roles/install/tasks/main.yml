@@ -39,3 +39,9 @@
 - name: Vault | Install Vault autounseal
   ansible.builtin.import_role:
     name: hashistack.vault.autounseal
+
+- name: "Vault | Replace systemd custom service file"
+  ansible.builtin.copy:
+    src: "vault.service"
+    dest: "/usr/lib/systemd/system/vault.service"
+    mode: '0644'

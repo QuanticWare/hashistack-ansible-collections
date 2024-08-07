@@ -1,0 +1,15 @@
+[Unit]
+Wants=consul.service
+After=consul.service
+{% if nomad_node_role == 'client' or nomad_node_role == 'both' and nomad_docker_driver %}
+After=docker.service
+{% endif %}
+{% if vault_node_role == 'server' %}
+After=vault-unseal.service
+{% endif %}
+
+[Service]
+ExecReload=/bin/kill --signal HUP $MAINPID
+{% if nomad_install_mode == 'single' %}
+ExecStop={{ ansible_venv_on_target_dir }}/bin/ansible-playbook -i localhost, /root/nomad_stop.yml
+{% endif %}
