@@ -47,13 +47,16 @@
     owner: "root"
     group: "root"
 
-- name: "Vault Install | Copy override settings for SystemD"
-  ansible.builtin.copy:
-    content: |
+- name: "Vault Install | Insert override settings for SystemD"
+  ansible.builtin.blockinfile:
+    path: "/etc/systemd/system/vault.service.d/override.conf"
+    marker: "# <!-- {mark} CONSUL WAIT -->"
+    block: |
       [Unit]
       After=consul.service
-    dest: "/etc/systemd/system/vault.service.d/override.conf"
     mode: '0644'
+    create: true
+  register: vault_override_insert
 
 - name: "Vault Install | Start Vault"
   ansible.builtin.systemd_service:
@@ -61,6 +64,7 @@
     name: vault
     enabled: true
     daemon_reload: true
+  when: vault_override_insert.changed
 
 - name: "Vault Install | Wait for Vault restarted"
   ansible.builtin.wait_for:

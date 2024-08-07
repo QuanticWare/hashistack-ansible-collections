@@ -21,14 +21,19 @@
     group: root
     mode: '0644'
 
-- name: "Vault Unseal | Copy override conf"
-  ansible.builtin.lineinfile:
+- name: "Vault Unseal | Insert override conf"
+  ansible.builtin.blockinfile:
     path: "/etc/systemd/system/vault.service.d/override.conf"
-    insertafter: '[Unit]'
-    line: 'Wants=vault-unseal.service'
+    marker: "# <!-- {mark} VAULT UNSEAL WANTS -->"
+    block: |
+      Wants=vault-unseal.service
+    mode: '0644'
+    create: true
+  register: vault_unseal_override_insert
 
 - name: "Vault Unseal | Register systemd service"
   ansible.builtin.systemd_service:
     name: vault-unseal.service
     enabled: true
     daemon_reload: true
+  when: vault_unseal_override_insert.changed
