@@ -22,6 +22,8 @@ docker_dns_configuration: true
 docker_dns_servers:
  - "{{ docker_gateway_ip }}"
 
+docker_metrics_addr: "{{ docker_tcp_listen_address }}:9323"
+
 # TLS
 # CA
 docker_ca_install_tls_ca_host: localhost
