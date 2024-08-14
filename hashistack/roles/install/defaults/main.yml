@@ -15,6 +15,7 @@ hashistack_cluster_name: "hashistack"
 hashistack_deploy_dc_name: "dc1"
 
 hashistack_group_vars_dir: "{{ project_dir }}/env/group_vars/{{ hashistack_cluster_name }}"
+hashistack_creds_file: "{% if hashistack_install_mode == 'single' %}{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/hashistack.yml{% else %}{{ project_dir }}/env/group_vars/{{ consul_deploy_cluster_name }}/hashistack.yml{% endif %}"
 
 hashistack_tls: true
 hashistack_acl: true

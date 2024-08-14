@@ -4,24 +4,28 @@
   run_once: true
 
 - block:
-  - ansible.builtin.debug:
-      msg: "Server quorum: {{ hashistack_servers_quorum }}"
-    run_once: true
+    - name: "Hashistack | Server Quorum"
+      ansible.builtin.debug:
+        msg: "Server quorum: {{ hashistack_servers_quorum }}"
+      run_once: true
 
-  - ansible.builtin.debug:
-      msg: "Clients available: {{ hashistack_clients_available }}"
-    run_once: true
+    - name: "Hashistack | Clients available"
+      ansible.builtin.debug:
+        msg: "Clients available: {{ hashistack_clients_available }}"
+      run_once: true
 
-  - ansible.builtin.set_fact:
-      hashistack_node_role: "server"
-    when: inventory_hostname in groups[hashistack_cluster_name][0:(hashistack_servers_quorum | int )]
+    - name: "Hashistack | Assign server role"
+      ansible.builtin.set_fact:
+        hashistack_node_role: "server"
+      when: inventory_hostname in groups[hashistack_cluster_name][0:(hashistack_servers_quorum | int )]
 
-  - ansible.builtin.set_fact:
-      hashistack_node_role: "client"
-    when: inventory_hostname in groups[hashistack_cluster_name][(hashistack_servers_quorum | int ):]
+    - name: "Hashistack | Assign client role"
+      ansible.builtin.set_fact:
+        hashistack_node_role: "client"
+      when: inventory_hostname in groups[hashistack_cluster_name][(hashistack_servers_quorum | int ):]
   when:
-  - hashistack_install_mode == 'cluster'
-  - hashistack_roles_auto_assign == true
+    - hashistack_install_mode == 'cluster'
+    - hashistack_roles_auto_assign == true
 
 - name: "Hashisatck | Set ACL mode to nodes"
   ansible.builtin.set_fact:
@@ -29,11 +33,26 @@
     consul_acl: "{% if hashistack_acl == true %}true{% else %}false{% endif %}"
     vault_acl: "{% if hashistack_acl == true %}true{% else %}false{% endif %}"
 
-- ansible.builtin.debug:
+- name: "Hashistack | ACL Status"
+  ansible.builtin.debug:
     msg: |
       {{ inventory_hostname }} - Nomad ACL: {{ nomad_acl }}
       {{ inventory_hostname }} - Consul ACL: {{ consul_acl }}
       {{ inventory_hostname }} - Vault ACL: {{ vault_acl }}
+
+- name: "Hashistack | Insert ACL status in host vars"
+  ansible.builtin.blockinfile:
+    path: "{{ hashistack_creds_file }}"
+    marker: "#<!-- {mark} HASHISTACK ACL STATUS ANSIBLE MANAGED BLOCK -->"
+    block: |
+      nomad_acl: {{ nomad_acl }}
+      consul_acl: {{ consul_acl }}
+      vault_acl: {{ vault_acl }}
+    create: true
+    mode: '0644'
+  delegate_to: localhost
+  become: false
+  run_once: true
 
 - name: "Hashisatck | Set TLS mode to nodes"
   ansible.builtin.set_fact:
@@ -41,11 +60,26 @@
     consul_tls: "{% if hashistack_tls == true %}true{% else %}false{% endif %}"
     vault_tls: "{% if hashistack_tls == true %}true{% else %}false{% endif %}"
 
-- ansible.builtin.debug:
+- name: "Hashistack | TLS Status"
+  ansible.builtin.debug:
     msg: |
       {{ inventory_hostname }} - Nomad TLS: {{ nomad_tls }}
       {{ inventory_hostname }} - Consul TLS: {{ consul_tls }}
       {{ inventory_hostname }} - Vault TLS: {{ vault_tls }}
+
+- name: "Hashistack | Insert TLS status in host vars"
+  ansible.builtin.blockinfile:
+    path: "{{ hashistack_creds_file }}"
+    marker: "#<!-- {mark} HASHISTACK TLS STATUS ANSIBLE MANAGED BLOCK -->"
+    block: |
+      nomad_tls: {{ nomad_tls }}
+      consul_tls: {{ consul_tls }}
+      vault_tls: {{ vault_tls }}
+    create: true
+    mode: '0644'
+  delegate_to: localhost
+  become: false
+  run_once: true
 
 - name: "Hashisatck | Set role to nodes"
   ansible.builtin.set_fact:
@@ -53,8 +87,8 @@
     consul_node_role: "{{ hashistack_node_role }}"
     vault_node_role: "{% if hashistack_node_role == 'server' %}server{% else %}none{% endif %}"
   when:
-  - hashistack_install_mode == 'cluster'
-  - hashistack_node_role is defined
+    - hashistack_install_mode == 'cluster'
+    - hashistack_node_role is defined
 
 - name: "Hashisatck | Set role to node"
   ansible.builtin.set_fact:
@@ -63,7 +97,8 @@
     vault_node_role: "server"
   when: hashistack_install_mode == 'single'
 
-- ansible.builtin.debug:
+- name: "Hashistack | Roles Status"
+  ansible.builtin.debug:
     msg: |
       {{ inventory_hostname }} - Nomad role: {{ nomad_node_role }}
       {{ inventory_hostname }} - Consul role: {{ consul_node_role }}
