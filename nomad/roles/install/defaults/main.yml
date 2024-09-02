@@ -75,8 +75,10 @@ nomad_install_port_serf: 4648
 
 # Network
 nomad_install_bridge: true
+
 nomad_install_bridge_list:
-- { name: "br1", ip_range: "172.18.0.1/16" }
+  - { name: "internal", interface: "br-internal", ip_range: "172.18.0.1/16" }
+  - { name: "metrics", interface: "br-metrics", ip_range: "172.19.0.1/16" }
 
 # Log
 nomad_install_debug: "true"
@@ -143,10 +145,13 @@ nomad_install_client_max_kill_timeout: "30s"
 
 nomad_install_client_network_interface: docker0
 
-nomad_install_client_host_network_list:
-- { name: "public", interface: "{{ ansible_default_ipv4.interface }}" }
-- { name: "cluster", interface: "{{ nomad_install_cluster_bridge | default(ansible_default_ipv4.interface) }}" }
-- { name: "private", interface: "{{ nomad_install_bridge_list | map(attribute='name') | first }}" }
+nomad_install_client_host_network_default:
+  name: "public"
+  interface: "{{ ansible_default_ipv4.interface }}"
+
+nomad_install_client_host_network_cluster:
+  name: "cluster"
+  interface: "{{ nomad_install_cluster_bridge }}"
 
 nomad_install_client_meta_list: {}
 
@@ -271,10 +276,10 @@ nomad_install_consul_auth_method_type: "jwt"
 nomad_install_backend_consul_jwt_boundaudiences: "consul.io"
 
 nomad_install_backend_consul_jwt_claimmap:
-- nomad_namespace
-- nomad_job_id
-- nomad_task
-- nomad_service
+  - nomad_namespace
+  - nomad_job_id
+  - nomad_task
+  - nomad_service
 
 nomad_install_backend_consul_jwt_name: "nomad-workloads"
 nomad_install_backend_consul_jwt_description: "JWT auth method for Nomad services and workloads"
@@ -324,8 +329,8 @@ nomad_install_vault_jwt_boundaudiences: "vault.io"
 
 nomad_install_vault_jwt_url: "{{ nomad_install_http_scheme }}://{{ nomad_install_http_ip }}:{{ nomad_install_http_port }}/.well-known/jwks.json"
 nomad_install_vault_jwt_algs:
-- RS256
-- EdDSA
+  - RS256
+  - EdDSA
 
 nomad_install_vault_jwt_name: "nomad-workloads"
 
@@ -368,21 +373,21 @@ nomad_install_docker_client_tls_privatekey: "{{ nomad_install_docker_client_dc_n
 nomad_install_docker_client_tls_ca_pubkey: "docker-ca.pem"
 
 nomad_install_docker_client_allow_caps:
-- audit_write
-- chown
-- dac_override
-- fowner
-- fsetid
-- kill
-- mknod
-- net_bind_service
-- setfcap
-- setgid
-- setpcap
-- setuid
-- sys_chroot
-- sys_ptrace
-- sys_admin
+  - audit_write
+  - chown
+  - dac_override
+  - fowner
+  - fsetid
+  - kill
+  - mknod
+  - net_bind_service
+  - setfcap
+  - setgid
+  - setpcap
+  - setuid
+  - sys_chroot
+  - sys_ptrace
+  - sys_admin
 
 nomad_install_docker_private_registry_state: false
 nomad_install_docker_private_registry_config: /etc/docker/config.json
