@@ -10,7 +10,7 @@ Ansible run action to operate with Nomad API HTTP
 
 job_create: Send job to Nomad API HTTP after convert HCL job file to json
 
-To be use only with `quanticware.deploy` role
+To be use only with `hashistack.deploy` role
 
 # Requirements
 
@@ -36,6 +36,34 @@ To find alloc ID
   ansible.builtin.import_role:
     name: hashistack.nomad.operate
     tasks_from: find_allocation_id
+```
+
+To create variables:
+```
+- name: "Put Nomad variable"
+  ansible.builtin.import_role:
+    name: hashistack.nomad.operate
+    tasks_from: variable_create
+  vars:
+    nomad_var_path: "nomad/jobs"
+    nomad_var_list:
+      - { key: "hostname", value: "{{ inventory_hostname | replace('.', '-') }}"}
+      - { key: "hostname_short", value: "{{ inventory_hostname | regex_search('^([^.]+)') }}"}
+      - { key: "fqdn", value: "{{ inventory_hostname }}"}
+```
+
+To delete variables:
+```
+- name: "Put Nomad variable"
+  ansible.builtin.import_role:
+    name: hashistack.nomad.operate
+    tasks_from: variable_delete
+  vars:
+    nomad_var_path: "nomad/jobs"
+    nomad_var_list:
+      - { key: "hostname", value: "{{ inventory_hostname | replace('.', '-') }}"}
+      - { key: "hostname_short", value: "{{ inventory_hostname | regex_search('^([^.]+)') }}"}
+      - { key: "fqdn", value: "{{ inventory_hostname }}"}
 ```
 
 # Vars
