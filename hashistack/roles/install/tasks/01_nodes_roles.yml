@@ -42,7 +42,7 @@
 
 - name: "Hashistack | Insert ACL status in host vars"
   ansible.builtin.blockinfile:
-    path: "{{ hashistack_creds_file }}"
+    path: "{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/hashistack.yml"
     marker: "#<!-- {mark} HASHISTACK ACL STATUS ANSIBLE MANAGED BLOCK -->"
     block: |
       nomad_acl: {{ nomad_acl }}
@@ -69,7 +69,7 @@
 
 - name: "Hashistack | Insert TLS status in host vars"
   ansible.builtin.blockinfile:
-    path: "{{ hashistack_creds_file }}"
+    path: "{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/hashistack.yml"
     marker: "#<!-- {mark} HASHISTACK TLS STATUS ANSIBLE MANAGED BLOCK -->"
     block: |
       nomad_tls: {{ nomad_tls }}
@@ -96,6 +96,20 @@
     consul_node_role: "both"
     vault_node_role: "server"
   when: hashistack_install_mode == 'single'
+
+- name: "Hashistack | Insert Node role in host vars"
+  ansible.builtin.blockinfile:
+    path: "{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/hashistack.yml"
+    marker: "#<!-- {mark} HASHISTACK NODE ROLE ANSIBLE MANAGED BLOCK -->"
+    block: |
+      nomad_node_role: {{ nomad_node_role }}
+      consul_node_role: {{ consul_node_role }}
+      vault_node_role: {{ vault_node_role }}
+    create: true
+    mode: '0644'
+  delegate_to: localhost
+  become: false
+  run_once: true
 
 - name: "Hashistack | Roles Status"
   ansible.builtin.debug:
