@@ -80,3 +80,6 @@
     mode: '0600'
   when: docker_dns_configuration
   notify: "Docker_restart"
+
+- name: "Docker Install | Restart Docker"
+  ansible.builtin.meta: flush_handlers
