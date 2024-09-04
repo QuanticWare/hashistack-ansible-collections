@@ -48,12 +48,18 @@
       ansible.builtin.copy:
         src: "{{ consul_install_tls_ca_host_dir }}/{{ consul_install_tls_cert_server }}"
         dest: "{{ consul_install_tls_host_certificate_dir }}/{{ consul_install_tls_cert_server }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
       when: consul_node_role == 'server' or consul_node_role == 'both'
 
     - name: "Consul | Copy {{ consul_install_tls_privatekey_server }} on nodes"
       ansible.builtin.copy:
         src: "{{ consul_install_tls_ca_host_dir }}/{{ consul_install_tls_privatekey_server }}"
         dest: "{{ consul_install_tls_host_certificate_dir }}/{{ consul_install_tls_privatekey_server }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
   when: consul_node_role == 'server' or consul_node_role == 'both'
 
 - block:
@@ -61,10 +67,16 @@
       ansible.builtin.copy:
         src: "{{ consul_install_tls_ca_host_dir }}/{{ consul_install_tls_cert_client }}"
         dest: "{{ consul_install_tls_host_certificate_dir }}/{{ consul_install_tls_cert_client }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
       when: consul_node_role == 'client' or consul_node_role == 'both'
 
     - name: "Consul | Copy {{ consul_install_tls_privatekey_client }} on nodes"
       ansible.builtin.copy:
         src: "{{ consul_install_tls_ca_host_dir }}/{{ consul_install_tls_privatekey_client }}"
         dest: "{{ consul_install_tls_host_certificate_dir }}/{{ consul_install_tls_privatekey_client }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
   when: consul_node_role == 'client'

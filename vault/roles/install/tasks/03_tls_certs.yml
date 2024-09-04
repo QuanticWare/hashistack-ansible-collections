@@ -22,8 +22,14 @@
   ansible.builtin.copy:
     src: "{{ vault_install_tls_ca_host_dir }}/{{ vault_install_tls_cert }}"
     dest: "{{ vault_install_tls_host_certificate_dir }}/{{ vault_install_tls_cert }}"
+    owner: "root"
+    group: "{{ hashistack_group }}"
+    mode: "0640"
 
 - name: "Vault | Copy {{ vault_install_tls_privatekey }}"
   ansible.builtin.copy:
     src: "{{ vault_install_tls_ca_host_dir }}/{{ vault_install_tls_privatekey }}"
     dest: "{{ vault_install_tls_host_certificate_dir }}/{{ vault_install_tls_privatekey }}"
+    owner: "root"
+    group: "{{ hashistack_group }}"
+    mode: "0640"

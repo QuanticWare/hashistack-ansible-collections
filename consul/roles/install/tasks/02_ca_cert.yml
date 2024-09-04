@@ -16,3 +16,6 @@
   ansible.builtin.copy:
     src: "{{ hashistack_install_tls_ca_host_dir }}/{{ hashistack_install_tls_ca_pubkey }}"
     dest: "{{ hashistack_install_tls_host_certificate_dir }}/{{ hashistack_install_tls_ca_pubkey }}"
+    owner: "root"
+    group: "{{ hashistack_group }}"
+    mode: "0640"

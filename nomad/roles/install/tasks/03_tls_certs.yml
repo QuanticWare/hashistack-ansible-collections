@@ -50,11 +50,17 @@
       ansible.builtin.copy:
         src: "{{ nomad_install_tls_ca_host_dir }}/{{ nomad_install_tls_cert_server }}"
         dest: "{{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_cert_server }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
 
     - name: "Nomad | Copy {{ nomad_install_dc_name }}-server-nomad.pem on nodes"
       ansible.builtin.copy:
         src: "{{ nomad_install_tls_ca_host_dir }}/{{ nomad_install_tls_privatekey_server }}"
         dest: "{{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_privatekey_server }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
   when: nomad_node_role == 'server' or nomad_node_role == 'both'
 
 - block:
@@ -62,11 +68,15 @@
       ansible.builtin.copy:
         src: "{{ nomad_install_tls_ca_host_dir }}/{{ nomad_install_tls_cert_client }}"
         dest: "{{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_cert_client }}"
+        mode: "0640"
 
     - name: "Nomad | Copy {{ nomad_install_dc_name }}-client-nomad.pem on nodes"
       ansible.builtin.copy:
         src: "{{ nomad_install_tls_ca_host_dir }}/{{ nomad_install_tls_privatekey_client }}"
         dest: "{{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_privatekey_client }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
   when: nomad_node_role == 'client'
 
 - block:
@@ -74,9 +84,13 @@
       ansible.builtin.copy:
         src: "{{ nomad_install_tls_ca_host_dir }}/{{ nomad_install_vault_tls_cert }}"
         dest: "{{ nomad_install_vault_tls_host_certificate_dir }}/{{ nomad_install_vault_tls_cert }}"
+        mode: "0640"
 
     - name: "Nomad | Copy {{ nomad_install_vault_tls_privatekey }}"
       ansible.builtin.copy:
         src: "{{ nomad_install_tls_ca_host_dir }}/{{ nomad_install_vault_tls_privatekey }}"
         dest: "{{ nomad_install_vault_tls_host_certificate_dir }}/{{ nomad_install_vault_tls_privatekey }}"
+        owner: "root"
+        group: "{{ hashistack_group }}"
+        mode: "0640"
   when: nomad_node_role == 'client'

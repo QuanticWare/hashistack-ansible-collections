@@ -23,6 +23,12 @@
     name: vault
     selection: hold
 
+- name: "Vault Install | Add user vault to group {{ hashistack_group }}"
+  ansible.builtin.user:
+    name: vault
+    groups: vault,{{ hashistack_group }}
+    append: true
+
 - name: "Vault Install | Copy config file"
   ansible.builtin.template:
     src: "vault.hcl.j2"

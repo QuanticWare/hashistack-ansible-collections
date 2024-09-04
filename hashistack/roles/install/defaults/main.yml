@@ -8,6 +8,7 @@ ansible_venv_on_target_dir: "/root/hashistack_venv"
 hashistack_timezone: "Europe/Paris"
 
 # Hashistack
+hashistack_group: "hashistack"
 
 hashistack_install_mode: "{% if (ansible_play_hosts | length) == 1 %}single{% elif (ansible_play_hosts | length) > 1 %}cluster{% endif %}"
 hashistack_cluster_name: "hashistack"

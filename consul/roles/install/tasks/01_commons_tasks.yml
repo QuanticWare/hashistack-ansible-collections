@@ -13,16 +13,21 @@
     mode: '0755'
     owner: "root"
     group: "root"
-  when: consul_tls == true
+  when: consul_tls
+
+- name: "Consul | Commons tasks | Create group {{ hashistack_group }}"
+  ansible.builtin.group:
+    name: "{{ hashistack_group }}"
+    state: present
 
 - name: "Consul | Commons tasks | Install requiered OS packages"
   ansible.builtin.apt:
     update_cache: true
     pkg:
-    - python3-pip
-    - python3-venv
-    - pipx
-    - jq
+      - python3-pip
+      - python3-venv
+      - pipx
+      - jq
 
 - name: "Consul | Commons tasks | Create venv for Consul installation"
   ansible.builtin.pip:
@@ -44,14 +49,14 @@
     types: [deb]
     uris: "https://apt.releases.hashicorp.com"
     signed_by: "https://apt.releases.hashicorp.com/gpg"
-    suites: ["{{ ansible_distribution_release|lower }}"]
+    suites: ["{{ ansible_distribution_release | lower }}"]
     components: [main]
     state: present
-    enabled: yes
+    enabled: true
 
 - name: "Consul | Commons tasks | Update APT Cache"
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
 
 - name: "Consul | Set role to nodes"
   ansible.builtin.set_fact:
@@ -64,7 +69,7 @@
   become: false
   run_once: true
   delegate_to: localhost
-  when: consul_tls == true
+  when: consul_tls
 
 - block:
     - name: "Consul | Commons tasks | Check if TLS cert exists for Servers"
@@ -78,10 +83,10 @@
         valid_at:
           delay: "{{ consul_install_tls_check_delay }}"
       register: tls_check_server
-      when: cert_tls_server_present.stat.exists == true
+      when: cert_tls_server_present.stat.exists
   when:
-  - consul_tls == true
-  - consul_node_role == 'server' or consul_node_role == 'both'
+    - consul_tls
+    - consul_node_role == 'server' or consul_node_role == 'both'
 
 - block:
     - name: "Consul | Commons tasks | Check if TLS cert exists for Client"
@@ -95,7 +100,7 @@
         valid_at:
           delay: "{{ consul_install_tls_check_delay }}"
       register: tls_check_client
-      when: cert_tls_client_present.stat.exists == true
+      when: cert_tls_client_present.stat.exists
   when:
-  - consul_tls == true
-  - consul_node_role == 'client'
+    - consul_tls
+    - consul_node_role == 'client'

@@ -11,6 +11,7 @@ vault_deploy_cluster_name: "{{ hashistack_cluster_name | default('default')}}"
 check_online_version: true
 vault_install_firewall: false
 
+hashistack_group: "hashistack"
 hashistack_creds_file: "{% if vault_install_mode == 'single' %}{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/hashistack.yml{% else %}{{ project_dir }}/env/group_vars/{{ vault_deploy_cluster_name }}/hashistack.yml{% endif %}"
 ansible_venv_on_target_dir: "/root/hashistack_venv"
 
