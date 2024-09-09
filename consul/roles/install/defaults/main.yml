@@ -94,7 +94,7 @@ consul_install_retry_interval_wan: "30s"
 consul_install_retry_join:  "\
   {% set consul_install_retry_join = [] %}\
   {% for host in groups[consul_deploy_cluster_name] %}\
-    {% if consul_install_retry_join.append(hostvars[host]['ansible_' + hostvars[host].consul_install_cluster_bridge].ipv4.address | default(consul_install_cluster_bridge)) %}{% endif %}\
+    {% if consul_install_retry_join.append(hostvars[host]['ansible_' + consul_install_cluster_bridge].ipv4.address | default(consul_install_cluster_bridge)) %}{% endif %}\
   {% endfor %}\
   {{ consul_install_retry_join }}"
 

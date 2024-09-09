@@ -18,7 +18,7 @@
     common_name: "{{ hashistack_install_tls_common_name }}"
   run_once: true
 
-- name: "Vault | Copy CA cert {{ hashistack_install_tls_ca_pubkey }} on nodes"
+- name: "Vault | Copy CA cert server on nodes - {{ hashistack_install_tls_ca_pubkey }}"
   ansible.builtin.copy:
     src: "{{ hashistack_install_tls_ca_host_dir }}/{{ hashistack_install_tls_ca_pubkey }}"
     dest: "{{ hashistack_install_tls_host_certificate_dir }}/{{ hashistack_install_tls_ca_pubkey }}"
