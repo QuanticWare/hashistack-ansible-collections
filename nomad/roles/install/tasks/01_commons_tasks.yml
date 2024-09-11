@@ -13,16 +13,21 @@
     mode: '0755'
     owner: "root"
     group: "root"
-  when: nomad_tls == true
+  when: nomad_tls
+
+- name: "Vault | Commons tasks | Create group {{ hashistack_group }}"
+  ansible.builtin.group:
+    name: "{{ hashistack_group }}"
+    state: present
 
 - name: "Nomad | Commons tasks | Install requiered OS packages"
   ansible.builtin.apt:
     update_cache: true
     pkg:
-    - python3-pip
-    - python3-venv
-    - pipx
-    - jq
+      - python3-pip
+      - python3-venv
+      - pipx
+      - jq
 
 - name: "Nomad | Commons tasks | Create Nomad job files directory"
   ansible.builtin.file:
@@ -52,14 +57,14 @@
     types: [deb]
     uris: "https://apt.releases.hashicorp.com"
     signed_by: "https://apt.releases.hashicorp.com/gpg"
-    suites: ["{{ ansible_distribution_release|lower }}"]
+    suites: ["{{ ansible_distribution_release | lower }}"]
     components: [main]
     state: present
-    enabled: yes
+    enabled: true
 
 - name: "Nomad | Commons tasks | Update APT Cache"
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
 
 - name: "Nomad | Set role to nodes"
   ansible.builtin.set_fact:
@@ -77,10 +82,10 @@
         valid_at:
           delay: "{{ nomad_install_tls_check_delay }}"
       register: tls_check_server
-      when: cert_tls_server_present.stat.exists == true
+      when: cert_tls_server_present.stat.exists
   when:
-  - nomad_tls == true
-  - nomad_node_role == 'server' or nomad_node_role == 'both'
+    - nomad_tls
+    - nomad_node_role == 'server' or nomad_node_role == 'both'
 
 - block:
     - name: "Nomad | Commons tasks | Check if TLS cert exists for Client"
@@ -94,10 +99,10 @@
         valid_at:
           delay: "{{ nomad_install_tls_check_delay }}"
       register: tls_check_client
-      when: cert_tls_client_present.stat.exists == true
+      when: cert_tls_client_present.stat.exists
   when:
-  - nomad_tls == true
-  - nomad_node_role == 'client'
+    - nomad_tls
+    - nomad_node_role == 'client'
 
 - name: "Nomad | Commons tasks | Check if TLS CA exists"
   ansible.builtin.stat:
@@ -106,4 +111,4 @@
   become: false
   run_once: true
   delegate_to: localhost
-  when: nomad_tls == true
+  when: nomad_tls

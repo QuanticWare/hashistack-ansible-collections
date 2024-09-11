@@ -84,7 +84,7 @@ storage "raft" {
 
 {% for host in groups[vault_deploy_cluster_name] %}
   retry_join {
-    leader_api_addr         = "{{ vault_install_http_scheme }}://{{ hostvars[host]['ansible_' + hostvars[host].vault_iface].ipv4.address }}:{{ vault_install_http_port }}"
+    leader_api_addr         = "{{ vault_install_http_scheme }}://{{ hostvars[host]['ansible_' + vault_iface].ipv4.address }}:{{ vault_install_http_port }}"
 {% if vault_tls == true %}
     leader_tls_servername   = "{{ host }}.{{ vault_install_dc_name }}.vault"
     leader_ca_cert_file     = "{{ vault_install_tls_host_certificate_dir }}/{{ vault_install_tls_ca_pubkey }}"

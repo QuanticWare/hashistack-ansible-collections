@@ -26,6 +26,13 @@
     name: nomad
     selection: hold
 
+- name: "Nomad Install | Add user nomad to group {{ hashistack_group }}"
+  ansible.builtin.user:
+    name: nomad
+    groups: nomad,{{ hashistack_group }}
+    append: true
+  when: nomad_node_role == 'server'
+
 - name: "Nomad Install | Change user and group for systemd Nomad"
   ansible.builtin.lineinfile:
     path: /lib/systemd/system/nomad.service

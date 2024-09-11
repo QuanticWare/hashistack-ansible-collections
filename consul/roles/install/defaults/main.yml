@@ -12,6 +12,7 @@ check_online_version: true
 consul_install_dns_resolution: true
 consul_install_firewall: false
 
+hashistack_group: "hashistack"
 hashistack_creds_file: "{% if consul_install_mode == 'single' %}{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/hashistack.yml{% else %}{{ project_dir }}/env/group_vars/{{ consul_deploy_cluster_name }}/hashistack.yml{% endif %}"
 ansible_venv_on_target_dir: "/root/hashistack_venv"
 
@@ -93,7 +94,7 @@ consul_install_retry_interval_wan: "30s"
 consul_install_retry_join:  "\
   {% set consul_install_retry_join = [] %}\
   {% for host in groups[consul_deploy_cluster_name] %}\
-    {% if consul_install_retry_join.append(hostvars[host]['ansible_' + hostvars[host].consul_install_cluster_bridge].ipv4.address | default(consul_install_cluster_bridge)) %}{% endif %}\
+    {% if consul_install_retry_join.append(hostvars[host]['ansible_' + consul_install_cluster_bridge].ipv4.address | default(consul_install_cluster_bridge)) %}{% endif %}\
   {% endfor %}\
   {{ consul_install_retry_join }}"
 

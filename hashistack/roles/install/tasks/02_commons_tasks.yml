@@ -13,12 +13,18 @@
     mode: '0755'
     owner: "root"
     group: "root"
-  when: hashistack_tls == true
+  when: hashistack_tls
+
+- name: "Hashistack | Commons tasks | Create group {{ hashistack_group }}"
+  ansible.builtin.group:
+    name: "{{ hashistack_group }}"
+    state: present
 
 - name: "Hashistack | Commons tasks | Create group_vars directory"
   ansible.builtin.file:
     path: "{{ hashistack_group_vars_dir }}"
     state: directory
+    mode: '0755'
   delegate_to: localhost
   become: false
   run_once: true
@@ -31,16 +37,16 @@
 
 - name: "Hashistack | Commons tasks | Update APT Cache"
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
 
 - name: "Hashistack | Commons tasks | Install requiered OS packages"
   ansible.builtin.apt:
     update_cache: true
     pkg:
-    - python3-pip
-    - python3-venv
-    - pipx
-    - jq
+      - python3-pip
+      - python3-venv
+      - pipx
+      - jq
 
 - name: "Hashistack | Commons tasks | Create venv for Hashistack installation"
   ansible.builtin.pip:
@@ -48,11 +54,11 @@
     virtualenv: "{{ ansible_venv_on_target_dir }}"
     virtualenv_command: "/usr/bin/python3 -m venv"
   loop:
-  - ansible
-  - passlib
-  - python-nomad
-  - python-consul
-  - python-debian
+    - ansible
+    - passlib
+    - python-nomad
+    - python-consul
+    - python-debian
 
 - name: "Hashistack | Commons tasks | Set Ansible Python Interpreter for Hashistack installation"
   ansible.builtin.set_fact:
@@ -64,14 +70,14 @@
     types: [deb]
     uris: "https://apt.releases.hashicorp.com"
     signed_by: "https://apt.releases.hashicorp.com/gpg"
-    suites: ["{{ ansible_distribution_release|lower }}"]
+    suites: ["{{ ansible_distribution_release | lower }}"]
     components: [main]
     state: present
-    enabled: yes
+    enabled: true
 
 - name: "Hashistack | Commons tasks | Update APT Cache"
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 432000
 
 - name: "Hashistack | Commons tasks | Check if TLS CA exists"
@@ -81,4 +87,4 @@
   become: false
   run_once: true
   delegate_to: localhost
-  when: hashistack_tls == true
+  when: hashistack_tls

@@ -8,6 +8,12 @@
     name: consul
     selection: hold
 
+- name: "Consul Install | Add user consul to group {{ hashistack_group }}"
+  ansible.builtin.user:
+    name: consul
+    groups: consul,{{ hashistack_group }}
+    append: true
+
 - name: "Consul Install | Block Gossip Encryption Key"
   block:
   - name: "Consul Install | Generate Gossip Encryption Key"
