@@ -7,8 +7,8 @@
 
 - name: "CNI | Install"
   ansible.builtin.include_tasks: "install.yml"
-  when: cni_install.stat.exists == false
+  when: not cni_install.stat.exists
 
 - name: "CNI | Upgrade"
   ansible.builtin.include_tasks: "upgrade.yml"
-  when: cni_install.stat.exists == true
+  when: cni_install.stat.exists
