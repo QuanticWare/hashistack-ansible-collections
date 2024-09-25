@@ -32,6 +32,11 @@
     dest: /opt/cni/bin
     remote_src: true
 
+- name: "CNI | Ensure br_netfilter is enabled"
+  community.general.modprobe:
+    name: br_netfilter
+    state: present
+
 - name: "CNI | Add to sysctl"
   ansible.posix.sysctl:
     name: "{{ item.name }}"
