@@ -25,6 +25,9 @@ vault_path: "{{ binary_path }}"
 vault_root_token: ""
 vault_secret_path: "apps/data/{{ fqdn }}" # /data/ is mandatory, vault specify
 
+vault_auth_method_type: jwt
+vault_auth_method_name: jwt-nomad
+
 # TLS
 vault_operate_tls_ca_host: localhost
 vault_operate_tls_ca_host_dir: "{{ project_dir }}/env/host_vars/{{ inventory_hostname }}/tls"
@@ -44,6 +47,21 @@ vault_extract_checksum_cmd: 'grep "vault_{{ vault_version }}_{{ ansible_system |
 vault_secret_to_get: "password"
 
 # Write
+
+# Role rules
+# vault_role_name: ""
+# vault_role_name: "backups-jobs"
+vault_role_role_type: "jwt"
+# vault_role_policies: '["backups-jobs"]'
+vault_role_user_claim: "/nomad_job_id"
+vault_role_bound_audiences: "vault.io"
+vault_role_claim_mapping_nomad_namespace: "nomad_namespace"
+vault_role_claim_mapping_nomad_job_id: "nomad_job_id"
+vault_role_claim_mapping_nomad_task: "nomad_task"
+vault_role_token_type: "service"
+vault_role_token_period: "30m"
+# vault_role_token_policies: "backups-jobs"
+vault_role_token_explicit_max_ttl: 0
 
 # Example:
 vault_secret:
