@@ -1,15 +1,30 @@
 ---
 - name: Vault Operate | Write token role
   ansible.builtin.uri:
-    url: "{{ vault_http_scheme }}://{{ vault_http_ip }}:{{ vault_http_port }}/v1/auth/token/roles/{{ vault_role_name }}"
+    url: "{{ vault_http_scheme }}://{{ vault_http_ip }}:{{ vault_http_port }}/v1/auth/{{ vault_auth_method_name }}/role/{{ vault_role_name }}"
     ca_path: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_ca_pubkey }}{% endif %}"
     client_cert: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_cert }}{% endif %}"
     client_key: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
     method: POST
     headers:
-        X-Vault-Token: "{{ vault_root_token | default(vault_init_result.json.root_token) }}"
-    body: '{{ vault_role_rules }}'
+      X-Vault-Token: "{{ vault_root_token | default(vault_init_result.json.root_token) }}"
+    body: "{{ vault_role_rules | to_nice_json }}"
     body_format: json
     status_code:
-        - 200
-        - 204
+      - 200
+      - 204
+  vars:
+    vault_role_rules:
+      role_type: "{{ vault_role_role_type }}"
+      bound_audiences: ["{{ vault_role_bound_audiences }}"]
+      user_claim: "{{ vault_role_user_claim }}"
+      user_claim_json_pointer: true
+      policies: "{{ vault_role_policies }}"
+      claim_mappings:
+        nomad_namespace: "{{ vault_role_claim_mapping_nomad_namespace }}"
+        nomad_job_id: "{{ vault_role_claim_mapping_nomad_job_id }}"
+        nomad_task: "{{ vault_role_claim_mapping_nomad_task }}"
+      token_type: "{{ vault_role_token_type }}"
+      token_policies: ["{{ vault_role_token_policies }}"]
+      token_period: "{{ vault_role_token_period }}"
+      token_explicit_max_ttl: 0
