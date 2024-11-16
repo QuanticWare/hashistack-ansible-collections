@@ -76,3 +76,6 @@
   ansible.builtin.debug:
     msg: "Consul is already up to date in version {{ consul_version }}"
   when: consul_version is in consul_installed_version.stdout
+
+- name: "Consul | Upgrade | Flush handlers"
+  ansible.builtin.meta: flush_handlers
