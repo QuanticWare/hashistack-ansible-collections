@@ -76,3 +76,6 @@
   ansible.builtin.debug:
     msg: "Nomad is already up to date in version {{ nomad_version }}"
   when: nomad_version is in nomad_installed_version.stdout
+
+- name: "Nomad | Upgrade | Flush handlers"
+  ansible.builtin.meta: flush_handlers

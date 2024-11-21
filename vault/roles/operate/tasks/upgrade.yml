@@ -97,3 +97,6 @@
   when:
     - vault_node_role == 'server'
     - vault_version is in vault_installed_version.stdout
+
+- name: "Vault | Upgrade | Flush handlers"
+  ansible.builtin.meta: flush_handlers
