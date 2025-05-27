@@ -6,17 +6,21 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     status_code:
-        - 200
-        - 404
-    return_content: yes
+      - 200
+      - 404
+    return_content: true
   register: consul_roles_list_raw
 
-- ansible.builtin.set_fact:
+- name: "Consul Role | Set Roles list as fact"
+  ansible.builtin.set_fact:
     consul_roles_list: "{{ consul_roles_list_raw.json | community.general.json_query('[*].Name') | string }}"
 
-- name: Consul Role | Create Role for {{ consul_role_name }} Consul access
+- name: "Consul Role | Create Role Consul access for {{ consul_role_name }}"
   ansible.builtin.uri:
     url: "{{ consul_http_scheme }}://{{ consul_http_ip }}:{{ consul_http_port }}/v1/acl/role"
     ca_path: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_ca_pubkey }}{% endif %}"
@@ -24,7 +28,10 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: PUT
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     body: |
         {
           "Name": "{{ consul_role_name }}",
@@ -37,10 +44,11 @@
         }
     body_format: json
     status_code:
-        - 200
+      - 200
   register: consul_new_role_name
   when: consul_role_name not in consul_roles_list
 
-- debug:
+- name: "Consul Role | Warning already exists - {{ consul_role_name }}"
+  ansible.builtin.debug:
     msg: "{{ consul_role_name }} already exists"
   when: consul_role_name in consul_roles_list

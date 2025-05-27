@@ -10,8 +10,8 @@
 - name: "Hashistack | Generate CA Cert"
   ansible.builtin.include_tasks: "03_ca_cert.yml"
   when:
-  - hashistack_tls == true
-  - cert_ca_tls_priv_present.stat.exists == false
+    - hashistack_tls
+    - not cert_ca_tls_priv_present.stat.exists
 
 - name: "Hashistack | Consul install"
   ansible.builtin.include_role:
@@ -29,7 +29,7 @@
 
 - name: "Hashistack | Firewall configuration"
   ansible.builtin.include_tasks: "04_firewall.yml"
-  when: hashistack_firewall == true
+  when: hashistack_firewall
 
 - name: "Hashistack | Congratulations!"
   ansible.builtin.include_role:

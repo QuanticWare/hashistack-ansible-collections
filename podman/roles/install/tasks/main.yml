@@ -2,12 +2,12 @@
 # tasks file for podman
 
 - name: "Podman | Install from source"
-  include_tasks: install.yml
+  ansible.builtin.include_tasks: install.yml
 
 - name: "Podman | Configure for rootless usage"
-  include_tasks: config_rootless.yml
-  when: podman_rootless == true
+  ansible.builtin.include_tasks: config_rootless.yml
+  when: podman_rootless
 
 - name: "Podman | Configure for root usage"
-  include_tasks: config_root.yml
-  when: podman_rootless == false
+  ansible.builtin.include_tasks: config_root.yml
+  when: not podman_rootless

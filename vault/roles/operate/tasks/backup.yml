@@ -16,7 +16,9 @@
     CONSUL_CACERT: "{{ consul_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_ca_pubkey }}{% endif %}"
     CONSUL_CLIENT_CERT: "{{ consul_operate_tls_host_certificate_dir }}/{{ vault_consul_backend_tls_cert }}"
     CONSUL_CLIENT_KEY: "{{ consul_operate_tls_host_certificate_dir }}/{{ vault_consul_backend_tls_privatekey }}"
-  when: vault_consul_backend == true
+  register: vault_backup_result
+  failed_when: vault_backup_result.rc != 0
+  when: vault_consul_backend
 
 - name: "Vault | Backup | Generate backup"
   ansible.builtin.shell: "vault operator raft snapshot save {{ vault_backup_basename }}.snap"
@@ -28,4 +30,6 @@
     VAULT_CACERT: "{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_ca_pubkey }}{% endif %}"
     VAULT_CLIENT_CERT: "{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_cert }}{% endif %}"
     VAULT_CLIENT_KEY: "{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
-  when: vault_consul_backend == false
+  register: vault_backup_result
+  failed_when: vault_backup_result.rc != 0
+  when: not vault_consul_backend

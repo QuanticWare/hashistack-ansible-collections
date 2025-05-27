@@ -16,7 +16,8 @@
     consul_policy_name: "agent-service"
   run_once: true
 
-- ansible.builtin.set_fact:
+- name: "Consul Token |  Set Consul token as fact"
+  ansible.builtin.set_fact:
     consul_agent_token: "{{ hostvars[groups[consul_deploy_cluster_name][0]]['consul_agent_token'] }}"
   when: consul_install_mode == 'cluster'
 
@@ -28,17 +29,20 @@
     client_key: "{% if consul_tls %}{{ consul_install_tls_host_certificate_dir }}/{{ consul_install_tls_privatekey_server }}{% endif %}"
     method: PUT
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     body: |
         {
           "Token": "{{ consul_new_token | default(consul_agent_token) }}"
         }
     body_format: json
     status_code:
-        - 200
+      - 200
   register: consul_acl_agent_status
   until: consul_acl_agent_status.status | int == 200
-  retries: 20
+  retries: 3
   delay: 5
-  no_log: true
+  # no_log: true
   when: consul_node_role == 'server' or consul_node_role == 'both'

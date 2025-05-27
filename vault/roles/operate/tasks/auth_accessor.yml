@@ -6,14 +6,16 @@
     client_key: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-        X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
+      X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
     status_code:
-        - 200
-        - 404
+      - 200
+      - 404
   register: vault_auth_list_raw
 
-- ansible.builtin.set_fact:
+- name: "Vault Auth | Set auth accessor"
+  ansible.builtin.set_fact:
     auth_accessord_id: "{{ vault_auth_list_raw.json.data[auth_method_path + '/'].accessor }}"
 
-- debug:
+- name: "Vault Auth | print auth accessor"
+  ansible.builtin.debug:
     msg: "{{ vault_auth_list_raw.json.data[auth_method_path + '/'].accessor }}"

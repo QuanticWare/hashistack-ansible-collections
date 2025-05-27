@@ -5,22 +5,22 @@
   ansible.builtin.include_role:
     name: hashistack.docker.install
   when:
-  - nomad_node_role == 'client' or nomad_node_role == 'both'
-  - nomad_docker_driver == true
+    - nomad_node_role == 'client' or nomad_node_role == 'both'
+    - nomad_docker_driver
 
 - name: "Nomad | Install CNI"
   ansible.builtin.include_role:
     name: hashistack.cni.install
   when:
-  - nomad_node_role == 'client' or nomad_node_role == 'both'
-  - nomad_docker_driver == true
+    - nomad_node_role == 'client' or nomad_node_role == 'both'
+    - nomad_docker_driver
 
 - name: "Nomad | Install Podman"
   ansible.builtin.include_role:
     name: hashistack.podman.install
   when:
-  - nomad_node_role == 'client' or nomad_node_role == 'both'
-  - nomad_podman_driver == true
+    - nomad_node_role == 'client' or nomad_node_role == 'both'
+    - nomad_podman_driver
 
 - name: "Nomad | Commons tasks"
   ansible.builtin.include_tasks: "01_commons_tasks.yml"
@@ -28,26 +28,26 @@
 - name: "Nomad | Generate CA Cert"
   ansible.builtin.include_tasks: "02_ca_cert.yml"
   when:
-  - nomad_tls == true
-  - cert_ca_tls_priv_present.stat.exists == false
+    - nomad_tls
+    - not cert_ca_tls_priv_present.stat.exists
 
 - name: "Nomad | TLS certs configuration"
   ansible.builtin.include_tasks: "03_tls_certs.yml"
-  when: nomad_tls == true
+  when: nomad_tls
 
 - name: "Nomad | Network configuration"
   ansible.builtin.include_tasks: "04_network.yml"
-  when: nomad_install_bridge == true
+  when: nomad_install_bridge
 
 - name: "Nomad | Consul Token"
   ansible.builtin.include_tasks: "05_consul_acl.yml"
   when:
-  - nomad_acl == true
-  - nomad_workload_identity_state == false
+    - nomad_acl
+    - not nomad_workload_identity_state
 
 - name: "Nomad | Vault Configuration"
   ansible.builtin.include_tasks: "06_vault.yml"
-  when: nomad_workload_identity_state == false
+  when: not nomad_workload_identity_state
   run_once: true
 
 - name: "Nomad | Install"
@@ -60,20 +60,20 @@
   ansible.builtin.include_tasks: "09_workload_identity_consul.yml"
   run_once: true
   when:
-  - nomad_acl == true
-  - nomad_workload_identity_state == true
+    - nomad_acl
+    - nomad_workload_identity_state
 
 - name: "Nomad | Workload Identity for Vault"
   ansible.builtin.include_tasks: "10_workload_identity_vault.yml"
   run_once: true
-  when: nomad_workload_identity_state == true
+  when: nomad_workload_identity_state
 
 - name: "Nomad | Change SystemD configuration"
   ansible.builtin.include_tasks: "11_systemd_tuning.yml"
 
 - name: "Nomad | Firewall configuration"
   ansible.builtin.include_tasks: "12_firewall.yml"
-  when: nomad_install_firewall == true
+  when: nomad_install_firewall
 
 - name: "Nomad | Install Nomad Auto Eligibility Node"
   ansible.builtin.import_role:

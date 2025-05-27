@@ -1,11 +1,11 @@
 - name: Podman | Create conf directories
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
     owner: "{{ role_user }}"
     group: "{{ role_user }}"
-    recurse: yes
+    recurse: true
   loop:
     - "/etc/containers"
     - "/run/containers/storage"
@@ -20,38 +20,42 @@
     group: "{{ podman_user }}"
     mode: '0755'
   loop:
-  - { src: "containers.conf.j2", dest: "containers.conf"}
-  - { src: "storage.conf.j2", dest: "storage.conf"}
-  - { src: "registries.conf.j2", dest: "registries.conf"}
-  - { src: "default-policy.json.j2", dest: "policy.json"}
+    - { src: "containers.conf.j2", dest: "containers.conf"}
+    - { src: "storage.conf.j2", dest: "storage.conf"}
+    - { src: "registries.conf.j2", dest: "registries.conf"}
+    - { src: "default-policy.json.j2", dest: "policy.json"}
 
 - name: Podman | Retreive GitHub latest version
-  uri:
+  ansible.builtin.uri:
     url: https://api.github.com/repos/containers/podman/releases/latest
     body_format: json
   register: tag
 
 - name: Podman | Unarchive Podman
   ansible.builtin.unarchive:
-    src: "https://github.com/containers/podman/archive/refs/tags/{{ tag.json.tag_name  }}.tar.gz"
+    src: "https://github.com/containers/podman/archive/refs/tags/{{ tag.json.tag_name }}.tar.gz"
     dest: "/tmp"
-    remote_src: yes
+    remote_src: true
 
 - name: Podman | Make
   ansible.builtin.command: make
   args:
-    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v','') }}"
+    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v', '') }}"
   environment:
     BUILDTAGS: "{{ podman_buildtags }}"
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/go/bin:/usr/local/go/bin"
+  register: podman_make
+  changed_when: podman_make.rc != 0
 
 - name: Podman | Make install
   ansible.builtin.command: make install
   args:
-    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v','') }}"
+    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v', '') }}"
   environment:
     BUILDTAGS: "{{ podman_buildtags }}"
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/go/bin:/usr/local/go/bin"
+  register: podman_make_install
+  changed_when: podman_make_install.rc != 0
 
 - name: Podman | Template systemd service
   ansible.builtin.template:

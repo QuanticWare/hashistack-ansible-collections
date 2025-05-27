@@ -16,3 +16,5 @@
     CONSUL_CACERT: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_ca_pubkey }}{% endif %}"
     CONSUL_CLIENT_CERT: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_cert }}{% endif %}"
     CONSUL_CLIENT_KEY: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
+  register: consul_backup
+  changed_when: consul_backup.rc != 0

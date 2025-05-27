@@ -29,7 +29,7 @@
       - 200
   no_log: true
   loop:
-  - "{{ ansible_local.vault.vault_keys_base64.0 | default(vault_keys_base64[0]) }}"
-  - "{{ ansible_local.vault.vault_keys_base64.1 | default(vault_keys_base64[1]) }}"
-  - "{{ ansible_local.vault.vault_keys_base64.2 | default(vault_keys_base64[2]) }}"
-  when: vault_sealed_status.json.sealed == true
+    - "{{ ansible_local.vault.vault_keys_base64.0 | default(vault_keys_base64[0]) }}"
+    - "{{ ansible_local.vault.vault_keys_base64.1 | default(vault_keys_base64[1]) }}"
+    - "{{ ansible_local.vault.vault_keys_base64.2 | default(vault_keys_base64[2]) }}"
+  when: vault_sealed_status.json.sealed
