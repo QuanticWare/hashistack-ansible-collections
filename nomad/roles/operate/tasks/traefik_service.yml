@@ -12,8 +12,9 @@
   ansible.builtin.template:
     src: "traefik_service.toml.j2"
     dest: "/data/{{ fqdn_traefik }}/data/conf/{{ fqdn }}.toml"
+    mode: "0644"
 
 - name: "Nomad | Operate | Nofitication by {{ delivery_method }}"
   ansible.builtin.import_role:
-    name: hashistack.notification.delivery
-  when: notification == true
+    name: hashistack.notification.
+  when: notification

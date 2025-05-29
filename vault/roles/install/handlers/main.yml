@@ -1,2 +1,6 @@
 ---
 # handlers file for install
+
+- name: "Vault_update_apt_cache"
+  ansible.builtin.apt:
+    update_cache: true

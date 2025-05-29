@@ -36,4 +36,4 @@
   ansible.builtin.copy:
     src: "consul.service"
     dest: "/usr/lib/systemd/system/consul.service"
-    mode: '0644'
+    mode: "0644"

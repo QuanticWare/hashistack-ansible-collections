@@ -44,4 +44,4 @@
   ansible.builtin.copy:
     src: "vault.service"
     dest: "/usr/lib/systemd/system/vault.service"
-    mode: '0644'
+    mode: "0644"

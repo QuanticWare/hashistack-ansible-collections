@@ -68,20 +68,11 @@
   run_once: true
   when: nomad_workload_identity_state
 
-- name: "Nomad | Change SystemD configuration"
-  ansible.builtin.include_tasks: "11_systemd_tuning.yml"
-
 - name: "Nomad | Firewall configuration"
-  ansible.builtin.include_tasks: "12_firewall.yml"
+  ansible.builtin.include_tasks: "11_firewall.yml"
   when: nomad_install_firewall
 
 - name: "Nomad | Install Nomad Auto Eligibility Node"
   ansible.builtin.import_role:
     name: hashistack.nomad.autoeligibility
   when: nomad_install_mode == 'single'
-
-- name: "Nomad | Replace systemd custom service file"
-  ansible.builtin.copy:
-    src: "nomad.service"
-    dest: "/usr/lib/systemd/system/nomad.service"
-    mode: '0644'

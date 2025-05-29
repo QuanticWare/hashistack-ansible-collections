@@ -3,6 +3,8 @@
   ansible.builtin.shell: 'jq -Rsc . {{ job_name }}.hcl > payload.json'
   args:
     chdir: "{{ nomad_job_files_dir }}"
+  register: nomad_convert_job_syntax
+  changed_when: nomad_convert_job_syntax.rc != 0
 
 - name: Nomad operate | Add JSON at BOF
   ansible.builtin.lineinfile:
@@ -17,57 +19,32 @@
     line: ',"Canonicalize":true }'
     insertafter: EOF
 
-- name: Nomad operate | Parse Job to convert in HCL in JSON
-  block:
-    - name: Nomad operate | Register job in ansible pipeline
-      ansible.builtin.slurp:
-        src: "{{ nomad_job_files_dir }}/payload.json"
-      register: job_payload_json
+- name: "Nomad operate | Register job in ansible pipeline"
+  ansible.builtin.slurp:
+    src: "{{ nomad_job_files_dir }}/payload.json"
+  register: job_payload_json
 
-    - ansible.builtin.uri:
-        url: "{{ nomad_http_scheme }}://{{ nomad_http_ip }}:{{ nomad_http_port }}/v1/jobs/parse"
-        ca_path: "{% if nomad_tls %}{{ nomad_operate_tls_host_certificate_dir }}/{{ nomad_operate_tls_ca_pubkey }}{% endif %}"
-        client_cert: "{% if nomad_tls %}{{ nomad_operate_tls_host_certificate_dir }}/{{ nomad_operate_tls_cert }}{% endif %}"
-        client_key: "{% if nomad_tls %}{{ nomad_operate_tls_host_certificate_dir }}/{{ nomad_operate_tls_privatekey }}{% endif %}"
-        method: POST
-        headers:
-          X-Nomad-Token: "{% if nomad_acl %}{{ nomad_management_token }}{% endif %}"
-        body:  "{{ job_payload_json['content'] | b64decode }}"
-        body_format: json
-        status_code:
-          - 200
-          - 204
-      register: job_payload_json
+- name: "Nomad operate | Parse Job to convert in HCL in JSON"
+  ansible.builtin.uri:
+    url: "{{ nomad_http_scheme }}://{{ nomad_http_ip }}:{{ nomad_http_port }}/v1/jobs/parse"
+    ca_path: "{% if nomad_tls %}{{ nomad_operate_tls_host_certificate_dir }}/{{ nomad_operate_tls_ca_pubkey }}{% endif %}"
+    client_cert: "{% if nomad_tls %}{{ nomad_operate_tls_host_certificate_dir }}/{{ nomad_operate_tls_cert }}{% endif %}"
+    client_key: "{% if nomad_tls %}{{ nomad_operate_tls_host_certificate_dir }}/{{ nomad_operate_tls_privatekey }}{% endif %}"
+    method: POST
+    headers:
+      X-Nomad-Token: "{% if nomad_acl %}{{ nomad_management_token }}{% endif %}"
+    body: "{{ job_payload_json['content'] | b64decode }}"
+    body_format: json
+    status_code:
+      - 200
+      - 204
+  register: job_payload_json
 
-    - name: Nomad operate | Create payload.json of {{ job_name }}
-      ansible.builtin.copy:
-        dest: "{{ nomad_job_files_dir }}/payload.json"
-        content: "{{ job_payload_json.json }}"
-
-# - name: Nomad operate | Parse Job to convert in HCL in JSON (unsecure)
-#   block:
-#     - name: Nomad operate | Register job in ansible pipeline
-#       ansible.builtin.slurp:
-#         src: "{{ nomad_job_files_dir }}/payload.json"
-#       register: job_payload_json
-
-#     - ansible.builtin.uri:
-#         url: "http://{{ nomad_http_ip }}:{{ nomad_http_port }}/v1/jobs/parse"
-#         method: POST
-#         # headers:
-#         #   X-Nomad-Token: "{% if nomad_acl %}{{ nomad_management_token }}{% endif %}"
-#         body:  "{{ job_payload_json['content'] | b64decode }}"
-#         body_format: json
-#         status_code:
-#           - 200
-#           - 204
-#       register: job_payload_json
-
-#     - name: Nomad operate | Create payload.json of {{ job_name }}
-#       ansible.builtin.copy:
-#         dest: "{{ nomad_job_files_dir }}/payload.json"
-#         content: "{{ job_payload_json.json }}"
-#   when: nomad_unsecure == true
+- name: Nomad operate | Create payload.json of {{ job_name }}
+  ansible.builtin.copy:
+    dest: "{{ nomad_job_files_dir }}/payload.json"
+    content: "{{ job_payload_json.json }}"
+    mode: "0644"
 
 - name: Nomad operate | Add JSON at BOF
   ansible.builtin.lineinfile:
@@ -85,6 +62,8 @@
   ansible.builtin.shell: 'jq . payload.json > {{ job_name }}.json'
   args:
     chdir: "{{ nomad_job_files_dir }}"
+  register: nomad_convert_job_syntax_jq
+  changed_when: nomad_convert_job_syntax_jq.rc != 0
 
 - name: Nomad operate | Remove useless payload.json
   ansible.builtin.file:
@@ -105,7 +84,7 @@
     method: POST
     headers:
       X-Nomad-Token: "{% if nomad_acl %}{{ nomad_management_token }}{% endif %}"
-    body:  "{{ job_payload_json['content'] | b64decode }}"
+    body: "{{ job_payload_json['content'] | b64decode }}"
     body_format: json
     status_code:
       - 200

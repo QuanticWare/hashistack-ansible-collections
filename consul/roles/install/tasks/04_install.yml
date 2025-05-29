@@ -45,6 +45,7 @@
   when:
     - consul_acl
     - consul_global_management_token is not defined
+  run_once: true
 
 - name: "Consul Install | Insert Consul ACL Global Management token"
   ansible.builtin.blockinfile:
@@ -57,6 +58,7 @@
   delegate_to: localhost
   become: false
   run_once: true
+  register: consul_global_management_token_inserted
   when: consul_acl
 
 - name: "Consul Install | Save ACL Replication token"
@@ -65,6 +67,7 @@
   when:
     - consul_acl
     - consul_acl_replication_token is not defined
+  run_once: true
 
 - name: "Consul Install | Insert Consul ACL Replication token"
   ansible.builtin.blockinfile:
@@ -113,7 +116,9 @@
     name: consul
     enabled: true
     daemon_reload: true
-  when: consul_node_role == 'server' or consul_node_role == 'both'
+  when:
+    - consul_node_role == 'server' or consul_node_role == 'both'
+    - consul_global_management_token_inserted.changed
 
 - name: "Consul Install | Wait for Consul restarted"
   ansible.builtin.wait_for:

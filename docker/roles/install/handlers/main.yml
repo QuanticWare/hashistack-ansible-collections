@@ -1,8 +1,12 @@
 ---
 # handlers file for quanticware.docker
 
-- name: Docker_restart
+- name: "Docker_restart"
   ansible.builtin.systemd_service:
     state: restarted
     name: docker
     enabled: true
+
+- name: "Docker_update_apt_cache"
+  ansible.builtin.apt:
+    update_cache: true

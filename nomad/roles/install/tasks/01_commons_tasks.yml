@@ -15,7 +15,15 @@
     group: "root"
   when: nomad_tls
 
-- name: "Vault | Commons tasks | Create group {{ hashistack_group }}"
+- name: "Nomad | Commons tasks | Create Nomad job files directory"
+  ansible.builtin.file:
+    path: "{{ nomad_job_files_dir }}"
+    state: directory
+    mode: '0755'
+    owner: "root"
+    group: "root"
+
+- name: "Nomad | Commons tasks | Create group {{ hashistack_group }}"
   ansible.builtin.group:
     name: "{{ hashistack_group }}"
     state: present
@@ -28,14 +36,6 @@
       - python3-venv
       - pipx
       - jq
-
-- name: "Nomad | Commons tasks | Create Nomad job files directory"
-  ansible.builtin.file:
-    path: "{{ nomad_job_files_dir }}"
-    state: directory
-    mode: '0755'
-    owner: "root"
-    group: "root"
 
 - name: "Nomad | Commons tasks | Create venv for Nomad installation"
   ansible.builtin.pip:
@@ -61,10 +61,10 @@
     components: [main]
     state: present
     enabled: true
+  notify: Nomad_update_apt_cache
 
-- name: "Nomad | Commons tasks | Update APT Cache"
-  ansible.builtin.apt:
-    update_cache: true
+- name: "Nomad | Flush handlers"
+  ansible.builtin.meta: flush_handlers
 
 - name: "Nomad | Set role to nodes"
   ansible.builtin.set_fact:
@@ -107,7 +107,6 @@
     - nomad_tls
     - nomad_node_role == 'client'
     - cert_tls_client_present.stat.exists
-
 
 - name: "Nomad | Commons tasks | Check if TLS CA exists"
   ansible.builtin.stat:

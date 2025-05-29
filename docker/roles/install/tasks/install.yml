@@ -21,12 +21,10 @@
     components: [stable]
     state: present
     enabled: true
-  register: docker_add_repo
+  notify: Docker_update_apt_cache
 
-- name: "Docker Install | Apt Update"
-  ansible.builtin.apt:
-    update_cache: true
-  when: docker_add_repo.changed
+- name: "Docker Install | flush_handlers"
+  ansible.builtin.meta: flush_handlers
 
 - name: "Docker Install | Uninstall OS defaults Docker packages"
   ansible.builtin.package:

@@ -15,6 +15,15 @@
     group: "root"
   when: vault_tls
 
+- name: "Vault | Commons tasks | Create Vault temp conf directory"
+  ansible.builtin.file:
+    path: "/var/tmp/hashistack/vault"
+    state: directory
+    recurse: true
+    mode: '0755'
+    owner: "root"
+    group: "root"
+
 - name: "Vault | Commons tasks | Create group {{ hashistack_group }}"
   ansible.builtin.group:
     name: "{{ hashistack_group }}"
@@ -53,10 +62,10 @@
     components: [main]
     state: present
     enabled: true
+  notify: Vault_update_apt_cache
 
-- name: "Vault | Commons tasks | Update APT Cache"
-  ansible.builtin.apt:
-    update_cache: true
+- name: "Vault | Flush handlers"
+  ansible.builtin.meta: flush_handlers
 
 - name: "Vault | Commons tasks | Check if TLS CA exists"
   ansible.builtin.stat:

@@ -33,7 +33,7 @@
   when: nomad_encrypt_key is not defined
   run_once: true
 
-- name: "Nomad Install | Insert Consul Encrypt key"
+- name: "Nomad Install | Insert Nomad Encrypt key"
   ansible.builtin.blockinfile:
     path: "{{ hashistack_creds_file }}"
     marker: "#<!-- {mark} NOMAD ENCRYPT KEY ANSIBLE MANAGED BLOCK -->"
@@ -44,6 +44,7 @@
   delegate_to: localhost
   become: false
   run_once: true
+  notify: "Nomad_restart"
 
 - name: "Nomad Configuration | Add user nomad to docker group"
   ansible.builtin.user:
@@ -53,6 +54,7 @@
   when:
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_docker_driver
+  notify: "Nomad_restart"
 
 - name: "Nomad Configuration | Insert Nomad docker configuration"
   ansible.builtin.template:
@@ -64,6 +66,7 @@
   when:
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_docker_driver
+  notify: "Nomad_restart"
 
 - name: "Nomad Podman Configuration | Retrieve brut list from hashicorp.com"
   ansible.builtin.uri:
@@ -74,6 +77,7 @@
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_podman_driver
     - check_online_version
+  notify: "Nomad_restart"
 
 - name: "Nomad Podman Configuration | Extract version number"
   ansible.builtin.set_fact:
@@ -88,6 +92,7 @@
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_podman_driver
     - check_online_version
+  notify: "Nomad_restart"
 
 - name: "Nomad Podman Configuration | Debug version number"
   ansible.builtin.debug:
@@ -95,6 +100,7 @@
   when:
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_podman_driver
+  notify: "Nomad_restart"
 
 - name: "Nomad Podman Configuration | Unarchive Nomad Podman driver for amd64"
   ansible.builtin.unarchive:
@@ -107,6 +113,7 @@
   when:
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_podman_driver
+  notify: "Nomad_restart"
 
 - name: "Nomad Podman Configuration | Insert Nomad Podman rootless configuration"
   ansible.builtin.template:
@@ -119,6 +126,7 @@
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_podman_driver
     - podman_rootless
+  notify: "Nomad_restart"
 
 - name: "Nomad Podman Configuration | Insert Nomad Podman root configuration"
   ansible.builtin.template:
@@ -131,6 +139,7 @@
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_podman_driver
     - not podman_rootless
+  notify: "Nomad_restart"
 
 - name: "Nomad Raw Configuration | Insert raw exec configuration"
   ansible.builtin.template:
@@ -142,6 +151,7 @@
   when:
     - nomad_node_role == 'client' or nomad_node_role == 'both'
     - nomad_raw_exec_driver
+  notify: "Nomad_restart"
 
 - name: "Nomad Install | Copy configurations files"
   ansible.builtin.template:
@@ -155,6 +165,7 @@
     - { src: "nomad.hcl.j2", dest: "nomad.hcl" }
     - { src: "consul.hcl.j2", dest: "consul.hcl" }
     - { src: "vault.hcl.j2", dest: "vault.hcl" }
+  notify: "Nomad_restart"
 
 - name: "Nomad Install | Copy TLS configuration file"
   ansible.builtin.template:
@@ -164,6 +175,8 @@
     group: nomad
     mode: '0644'
   when: nomad_tls
+  register: nomad_tls_config_added
+  notify: "Nomad_restart"
 
 - name: "Nomad Install | Copy configurations files for servers"
   ansible.builtin.template:
@@ -175,6 +188,7 @@
   loop:
     - { src: "server.hcl.j2", dest: "server.hcl" }
   when: nomad_node_role == 'server' or nomad_node_role == 'both'
+  notify: "Nomad_restart"
 
 - name: "Nomad Install | Copy configurations files for clients"
   ansible.builtin.template:
@@ -186,13 +200,10 @@
   loop:
     - { src: "client.hcl.j2", dest: "client.hcl" }
   when: nomad_node_role == 'client' or nomad_node_role == 'both'
+  notify: "Nomad_restart"
 
-- name: "Nomad Configuration | Restart Nomad"
-  ansible.builtin.systemd_service:
-    name: nomad
-    state: restarted
-    enabled: true
-    daemon_reload: true
+- name: Nomad Configuration | Flush handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: "Nomad Configuration | Wait for Nomad started"
   ansible.builtin.wait_for:

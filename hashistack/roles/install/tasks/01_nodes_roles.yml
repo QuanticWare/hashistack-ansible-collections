@@ -57,10 +57,9 @@
       consul_acl: {{ consul_acl }}
       vault_acl: {{ vault_acl }}
     create: true
-    mode: '0644'
+    mode: "0644"
   delegate_to: localhost
   become: false
-  run_once: true
 
 - name: "Hashisatck | Set TLS mode to nodes"
   ansible.builtin.set_fact:
@@ -84,10 +83,9 @@
       consul_tls: {{ consul_tls }}
       vault_tls: {{ vault_tls }}
     create: true
-    mode: '0644'
+    mode: "0644"
   delegate_to: localhost
   become: false
-  run_once: true
 
 - name: "Hashisatck | Set role to nodes"
   ansible.builtin.set_fact:
@@ -114,10 +112,9 @@
       consul_node_role: {{ consul_node_role }}
       vault_node_role: {{ vault_node_role }}
     create: true
-    mode: '0644'
+    mode: "0644"
   delegate_to: localhost
   become: false
-  run_once: true
 
 - name: "Hashistack | Roles Status"
   ansible.builtin.debug:

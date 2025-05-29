@@ -15,6 +15,14 @@
     group: "root"
   when: consul_tls
 
+- name: "Consul | Commons tasks | Create Consul temp conf directory"
+  ansible.builtin.file:
+    path: "/var/tmp/hashistack/consul"
+    state: directory
+    mode: '0755'
+    owner: "root"
+    group: "root"
+
 - name: "Consul | Commons tasks | Create group {{ hashistack_group }}"
   ansible.builtin.group:
     name: "{{ hashistack_group }}"
@@ -53,10 +61,10 @@
     components: [main]
     state: present
     enabled: true
+  notify: Consul_update_apt_cache
 
-- name: "Consul | Commons tasks | Update APT Cache"
-  ansible.builtin.apt:
-    update_cache: true
+- name: "Consul | Flush handlers"
+  ansible.builtin.meta: flush_handlers
 
 - name: "Consul | Set role to nodes"
   ansible.builtin.set_fact:
