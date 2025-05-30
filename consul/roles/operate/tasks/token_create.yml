@@ -47,7 +47,7 @@
     block: |
       consul_{{ consul_token_name }}_token: "{{ consul_new_token_name.json.SecretID }}"
     create: true
-    mode: '0644'
+    mode: "0644"
   delegate_to: localhost
   become: false
   when: 'consul_token_name not in consul_tokens_list'

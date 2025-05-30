@@ -9,6 +9,16 @@ After=vault-unseal.service
 {% endif %}
 
 [Service]
+{% if nomad_node_role == 'server' %}
+Group=nomad
+{% elif nomad_node_role == 'client' or nomad_node_role == 'both' %}
+Group=root
+{% endif %}
+{% if nomad_node_role == 'server' %}
+User=nomad
+{% elif nomad_node_role == 'client' or nomad_node_role == 'both' %}
+User=root
+{% endif %}
 ExecReload=/bin/kill --signal HUP $MAINPID
 {% if nomad_install_mode == 'single' %}
 ExecStop={{ ansible_venv_on_target_dir }}/bin/ansible-playbook -i localhost, /root/nomad_stop.yml

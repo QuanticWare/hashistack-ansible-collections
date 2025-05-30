@@ -6,17 +6,21 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     status_code:
-        - 200
-        - 404
-    return_content: yes
+      - 200
+      - 404
+    return_content: true
   register: consul_policies_list_raw
 
-- ansible.builtin.set_fact:
+- name: "Consul Policy | Set policies list as fact"
+  ansible.builtin.set_fact:
     consul_policies_list: "{{ consul_policies_list_raw.json | community.general.json_query('[*].Name') | string }}"
 
-- name: "Consul Policy | Create policy for {{ consul_policy_name }} Consul access"
+- name: "Consul Policy | Create policy Consul access for {{ consul_policy_name }} "
   ansible.builtin.uri:
     url: "{{ consul_http_scheme }}://{{ consul_http_ip }}:{{ consul_http_port }}/v1/acl/policy"
     ca_path: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_ca_pubkey }}{% endif %}"
@@ -24,7 +28,10 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: PUT
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     body: |
         {
           "Name": "{{ consul_policy_name | lower }}",
@@ -32,5 +39,5 @@
         }
     body_format: json
     status_code:
-        - 200
+      - 200
   when: 'consul_policy_name not in consul_policies_list'

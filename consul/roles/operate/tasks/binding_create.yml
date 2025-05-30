@@ -6,17 +6,21 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     status_code:
-        - 200
-        - 404
-    return_content: yes
+      - 200
+      - 404
+    return_content: true
   register: consul_binding_rule_list_raw
 
-- ansible.builtin.set_fact:
+- name: "Consul Binding Rule | Set Binding Rule list as fact"
+  ansible.builtin.set_fact:
     consul_binding_rule_list: "{{ consul_binding_rule_list_raw.json | community.general.json_query('[*].BindName') | string }}"
 
-- name: "Consul Binding Rule | Create Binding Rule {{ consul_binding_method }} for consul_binding_type"
+- name: "Consul Binding Rule | Create Binding Rule for consul_binding_type - {{ consul_binding_method }}"
   ansible.builtin.uri:
     url: "{{ consul_http_scheme }}://{{ consul_http_ip }}:{{ consul_http_port }}/v1/acl/binding-rule"
     ca_path: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_ca_pubkey }}{% endif %}"
@@ -24,7 +28,10 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: PUT
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     body: |
         {
           "Description": "{{ consul_binding_rule_description | default(consul_binding_method) }}",
@@ -35,10 +42,11 @@
         }
     body_format: json
     status_code:
-        - 200
+      - 200
   register: consul_new_binding_rule_name
   when: consul_binding_name not in consul_binding_rule_list
 
-- debug:
+- name: "Consul Binding Rule | Warning message already exists"
+  ansible.builtin.debug:
     msg: "{{ consul_binding_method }} for {{ consul_binding_name }} binding already exists"
   when: consul_binding_name in consul_binding_rule_list

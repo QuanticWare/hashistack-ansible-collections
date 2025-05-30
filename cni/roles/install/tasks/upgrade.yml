@@ -1,6 +1,7 @@
 - name: "CNI | Check installed version"
   ansible.builtin.command: /opt/cni/bin/bridge -V
   register: cni_installed_version
+  changed_when: cni_installed_version.rc != 0
 
 - name: "CNI | Retreive GitHub latest version"
   ansible.builtin.uri:

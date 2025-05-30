@@ -6,17 +6,20 @@
     client_key: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-        X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
+      X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
     status_code:
-        - 200
-        - 429
-        - 472
-        - 473
-        - 501
-        - 503
+      - 200
+      - 429
+      - 472
+      - 473
+      - 501
+      - 503
   register: vault_health
 
-- ansible.builtin.set_fact:
+- name: "Vault | Operate | Set fact for vault health"
+  ansible.builtin.set_fact:
     vault_health_fact: "{{ vault_health.status | int }}"
-- debug:
+
+- name: "Vault | Operate | Print vault health"
+  ansible.builtin.debug:
     msg: "Vault has status code: {{ vault_health.status }}"

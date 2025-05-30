@@ -7,7 +7,7 @@
     client_key: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
     method: POST
     headers:
-        X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
+      X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
     body: |
         {
           "policies": {{ vault_policies | to_json }},
@@ -17,12 +17,14 @@
         }
     body_format: json
     status_code:
-        - 200
-        - 204
+      - 200
+      - 204
   register: vault_new_token_result_secure
 
-- ansible.builtin.set_fact:
+- name: "Vault | Operate | Set Token Fact"
+  ansible.builtin.set_fact:
     vault_new_token_result: "{{ vault_new_token_result_secure | default(vault_new_token_result_unsecure) }}"
 
-- ansible.builtin.debug:
+- name: "Vault | Operate | Print Token"
+  ansible.builtin.debug:
     msg: "{{ vault_new_token_result.json.auth.client_token }}"

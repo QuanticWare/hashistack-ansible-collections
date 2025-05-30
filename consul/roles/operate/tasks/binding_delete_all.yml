@@ -6,17 +6,22 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     status_code:
-        - 200
-        - 404
-    return_content: yes
+      - 200
+      - 404
+    return_content: true
   register: consul_binding_rule_list_raw
 
-- ansible.builtin.set_fact:
+- name: "Consul Binding Rule | Set Binding Rule list as fact"
+  ansible.builtin.set_fact:
     consul_binding_rule_list: "{{ consul_binding_rule_list_raw.json | community.general.json_query('[*].ID') | list }}"
 
-- debug:
+- name: "Consul Binding Rule | Print list"
+  ansible.builtin.debug:
     msg: "{{ consul_binding_rule_list }}"
 
 - name: "Consul Delete Rule | Delete Binding Rule list"
@@ -27,9 +32,12 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: DELETE
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     status_code:
-        - 200
-        - 404
-    return_content: yes
+      - 200
+      - 404
+    return_content: true
   loop: "{{ consul_binding_rule_list }}"

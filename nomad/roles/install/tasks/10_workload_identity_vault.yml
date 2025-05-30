@@ -7,9 +7,13 @@
     vault_auth_method_type: "{{ nomad_install_vault_auth_method_type }}"
 
 - name: "Nomad | Vault | Transform to one line CA pem"
-  ansible.builtin.shell: "cat {{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_ca_pubkey }} | sed ':a;N;$!ba;s/\\n/\\n/g'"
+  ansible.builtin.shell: >
+    set -o pipefail && cat {{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_ca_pubkey }} | sed ':a;N;$!ba;s/\\n/\\n/g'
+  args:
+    executable: /bin/bash
   register: ca_certificate_output
-  when: nomad_tls == true
+  changed_when: ca_certificate_output.rc != 0
+  when: nomad_tls
 
 - name: "Nomad | Vault | Configure Auth method"
   ansible.builtin.import_role:

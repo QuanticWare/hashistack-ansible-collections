@@ -6,14 +6,16 @@
     client_key: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-        X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
+      X-Vault-Token: "{{ vault_init_result.json.root_token | default(vault_root_token) }}"
     status_code:
-        - 200
-        - 204
+      - 200
+      - 204
   register: vault_seal_status
 
-- ansible.builtin.set_fact:
+- name: "Vault | Operate | Set Seal Status Fact"
+  ansible.builtin.set_fact:
     vault_seal_status_fact: "{{ vault_seal_status.json | community.general.json_query('sealed') | string }}"
 
-- debug:
+- name: "Vault | Operate | Debug Seal Status"
+  ansible.builtin.debug:
     msg: "Vault Seal Status: {{ vault_seal_status_fact }}"

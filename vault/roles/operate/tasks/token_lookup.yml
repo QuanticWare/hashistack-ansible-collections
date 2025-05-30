@@ -16,5 +16,6 @@
       - 200
   register: "vault_token_lookup"
 
-- debug:
+- name: "Vault Token | Print Lookup a token"
+  ansible.builtin.debug:
     msg: "{{ vault_token_lookup.json.data }}"

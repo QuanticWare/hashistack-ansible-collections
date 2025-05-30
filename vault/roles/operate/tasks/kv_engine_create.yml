@@ -6,10 +6,10 @@
     client_key: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
     method: GET
     headers:
-        X-Vault-Token: "{{ vault_root_token }}"
+      X-Vault-Token: "{{ vault_root_token }}"
     status_code:
-        - 200
-        - 404
+      - 200
+      - 404
   register: vault_check_kv
 
 - name: "Enable KV Engine"
@@ -20,7 +20,7 @@
     client_key: "{% if vault_tls %}{{ vault_operate_tls_host_certificate_dir }}/{{ vault_operate_tls_privatekey }}{% endif %}"
     method: POST
     headers:
-        X-Vault-Token: "{{ vault_root_token }}"
+      X-Vault-Token: "{{ vault_root_token }}"
     body: |
         {
           "type": "kv",
@@ -30,9 +30,10 @@
         }
     body_format: json
     status_code:
-        - 204
+      - 204
   when: vault_check_kv.status == 404
 
-- debug:
+- name: "Vault | Operate | Print kv engine status"
+  ansible.builtin.debug:
     msg: "Secret engine kv: {{ vault_kv_name }} already exists"
   when: vault_check_kv.status == 200 or vault_check_kv.status == 204

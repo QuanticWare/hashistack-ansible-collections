@@ -6,8 +6,8 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: PUT
     body_format: json
-    body: "{{ lookup('ansible.builtin.template','service_register.json.j2') }}"
+    body: "{{ lookup('ansible.builtin.template', 'service_register.json.j2') }}"
     headers:
       X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(consul_master_token) }}{% endif %}"
     status_code:
-        - 200
+      - 200

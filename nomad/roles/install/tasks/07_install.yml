@@ -1,13 +1,13 @@
 - name: "Nomad Install | Install binary"
   ansible.builtin.apt:
     name: nomad
-    update_cache: yes
+    update_cache: true
   when: nomad_install_version is not defined
 
 - name: "Nomad Install | Install binary"
   ansible.builtin.apt:
     name: "nomad={{ nomad_install_version }}-1"
-    update_cache: yes
+    update_cache: true
   when: nomad_install_version is defined
 
 - name: "Nomad Install | Create Nomad logs and data directories"
@@ -18,8 +18,8 @@
     owner: "{{ nomad_install_user }}"
     mode: '0755'
   loop:
-  - /var/log/nomad
-  - /opt/nomad
+    - /var/log/nomad
+    - /opt/nomad
 
 - name: "Nomad Install | Prevent Nomad from being upgraded"
   ansible.builtin.dpkg_selections:
@@ -33,15 +33,29 @@
     append: true
   when: nomad_node_role == 'server'
 
-- name: "Nomad Install | Change user and group for systemd Nomad"
-  ansible.builtin.lineinfile:
-    path: /lib/systemd/system/nomad.service
-    insertafter: '\[Service\]'
-    line: "{{ item }}"
-  loop:
-  - "{% if nomad_node_role == 'server' %}Group=nomad{% elif nomad_node_role == 'client' or nomad_node_role == 'both' %}Group=root{% endif %}"
-  - "{% if nomad_node_role == 'server' %}User=nomad{% elif nomad_node_role == 'client' or nomad_node_role == 'both'%}User=root{% endif %}"
+- name: "Nomad Install | Create systemd override directory"
+  ansible.builtin.file:
+    path: "/etc/systemd/system/nomad.service.d"
+    state: directory
+    mode: "0755"
+    owner: "root"
+    group: "root"
 
-- name: "Nomad | SystemD Daemon Reload"
+- name: Nomad Install | Template for systemd override
+  ansible.builtin.template:
+    src: "override.conf.j2"
+    dest: "/etc/systemd/system/nomad.service.d/override.conf"
+    mode: "0644"
+
+- name: "Nomad Install | Playbook's template"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/root/{{ item }}"
+    mode: "0644"
+  loop:
+    - nomad_stop.yml
+  when: nomad_install_mode == 'single'
+
+- name: "Nomad Install | Daemon reload systemd"
   ansible.builtin.systemd_service:
     daemon_reload: true

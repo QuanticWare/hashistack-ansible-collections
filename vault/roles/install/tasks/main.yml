@@ -1,5 +1,5 @@
 ---
-#tasks file for install
+# tasks file for Vault Install
 
 - name: "Vault | Commons tasks"
   ansible.builtin.include_tasks: "01_commons_tasks.yml"
@@ -7,18 +7,18 @@
 - name: "Consul | Generate CA Cert"
   ansible.builtin.include_tasks: "02_ca_cert.yml"
   when:
-  - vault_tls == true
-  - cert_ca_tls_priv_present.stat.exists == false
+    - vault_tls
+    - not cert_ca_tls_priv_present.stat.exists
 
 - name: "Consul | TLS certs configuration"
   ansible.builtin.include_tasks: "03_tls_certs.yml"
   when:
-  - vault_tls == true
-  - cert_tls_present.stat.exists == false or (cert_tls_present.stat.exists == true and tls_check.valid_at.delay == false)
+    - vault_tls
+    - not cert_tls_present.stat.exists or (cert_tls_present.stat.exists and not tls_check.valid_at.delay)
 
 - name: "Vault | Consul ACL"
   ansible.builtin.include_tasks: "04_consul_acl.yml"
-  when: vault_acl == true
+  when: vault_acl
 
 - name: "Vault | Install"
   ansible.builtin.include_tasks: "05_install.yml"
@@ -28,7 +28,7 @@
 
 - name: "Vault | Firewall Configuration"
   ansible.builtin.include_tasks: "07_firewall.yml"
-  when: vault_install_firewall == true
+  when: vault_install_firewall
 
 - name: "Vault | Create KV"
   ansible.builtin.import_role:
@@ -44,4 +44,4 @@
   ansible.builtin.copy:
     src: "vault.service"
     dest: "/usr/lib/systemd/system/vault.service"
-    mode: '0644'
+    mode: "0644"

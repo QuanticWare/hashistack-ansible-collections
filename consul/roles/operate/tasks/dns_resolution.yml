@@ -11,12 +11,10 @@
     owner: root
     group: root
     mode: '0644'
+  notify: Consul_restart
 
-- name: "Consul Operate | DNS Resolution | Restart service"
-  ansible.builtin.systemd_service:
-    state: restarted
-    daemon_reload: true
-    name: systemd-resolved
+- name: "Consul Operate | Flush handlers"
+  ansible.builtin.meta: flush_handlers
 
 - name: "Consul Operate | DNS Resolution | Create Consul policy"
   ansible.builtin.include_role:
@@ -36,7 +34,10 @@
     client_key: "{% if consul_tls %}{{ consul_operate_tls_host_certificate_dir }}/{{ consul_operate_tls_privatekey }}{% endif %}"
     method: PUT
     headers:
-      X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}{% endif %}"
+      X-Consul-Token: >-
+        {% if consul_acl %}
+        {{ consul_global_management_token | default(ansible_local.consul_global_management_token.consul_global_management_token) }}
+        {% endif %}
     body: |
         {
           "Policies": [

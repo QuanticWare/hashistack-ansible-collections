@@ -12,19 +12,20 @@
   register: user_info
 
 - name: Podman | Create podman systemd directory
-  file:
+  ansible.builtin.file:
     path: "/home/{{ podman_user }}/.config/systemd/user"
     state: directory
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
     mode: "0755"
-    recurse: yes
+    recurse: true
 
 - name: Podman | Set systemd runtime dir
   ansible.builtin.set_fact:
     xdg_runtime_dir: "/run/user/{{ user_info.uid }}"
 
-- set_fact:
+- name: "Podman | Set podman facts"
+  ansible.builtin.set_fact:
     podman_rootless_facts: |
       {
         "xdg_runtime_dir": "/run/user/{{ user_info.uid }}",
@@ -43,7 +44,9 @@
     line: 'export XDG_RUNTIME_DIR="/run/user/$UID"'
 
 - name: Enable lingering is needed
-  command: "loginctl enable-linger {{ podman_user }}"
+  ansible.builtin.command: "loginctl enable-linger {{ podman_user }}"
+  register: podman_lingering
+  changed_when: podman_lingering.rc != 0
 
 - name: Podman | Templates systemd service
   ansible.builtin.template:
@@ -60,9 +63,9 @@
   ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
-    sysctl_set: yes
+    sysctl_set: true
     state: present
-    reload: yes
+    reload: true
   loop:
     - { name: "net.ipv4.ip_unprivileged_port_start", value: "80" }
     - { name: "net.ipv4.ping_group_range", value: "0 2000000" }
@@ -82,7 +85,7 @@
     mode: '0755'
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
-    recurse: yes
+    recurse: true
 
 - name: Podman | Templates Podman configurations files
   ansible.builtin.template:
@@ -92,10 +95,10 @@
     group: "{{ podman_user }}"
     mode: '0755'
   loop:
-  - { src: "containers.conf.j2", dest: "containers.conf"}
-  - { src: "storage.conf.j2", dest: "storage.conf"}
-  - { src: "registries.conf.j2", dest: "registries.conf"}
-  - { src: "default-policy.json.j2", dest: "policy.json"}
+    - { src: "containers.conf.j2", dest: "containers.conf"}
+    - { src: "storage.conf.j2", dest: "storage.conf"}
+    - { src: "registries.conf.j2", dest: "registries.conf"}
+    - { src: "default-policy.json.j2", dest: "policy.json"}
 
 - name: Podman | Create ansible tmp directory
   ansible.builtin.file:
@@ -104,7 +107,7 @@
     mode: '0755'
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
-    recurse: yes
+    recurse: true
 
 - name:  Podman | Run systemd socket API
   become_user: "{{ podman_user }}"

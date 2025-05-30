@@ -2,6 +2,7 @@
   ansible.builtin.template:
     src: 50-bridge.yaml.j2
     dest: /etc/netplan/50-bridge.yaml
+    mode: "0644"
   register: netplan_config
 
 - name: "Nomad | Network | Netplan Apply"
@@ -9,3 +10,4 @@
   async: 45
   poll: 0
   when: netplan_config is changed
+  register: netplan_apply

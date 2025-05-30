@@ -16,7 +16,7 @@
     status_code:
       - 200
   register: "vault_token_renew"
-  when: vault_token_renew_self == false
+  when: not vault_token_renew_self
 
 - name: Vault Token | Renew a token self
   ansible.builtin.uri:
@@ -35,7 +35,8 @@
     status_code:
       - 200
   register: "vault_token_renew"
-  when: vault_token_renew_self == true
+  when: vault_token_renew_self
 
-- debug:
+- name: "Vault Token | Print Renew a token"
+  ansible.builtin.debug:
     msg: "{{ vault_token_renew }}"

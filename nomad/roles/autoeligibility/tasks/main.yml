@@ -20,7 +20,8 @@
     nomad_policy_name: "nomad-policy-autoeligibility"
     nomad_token_global: "false"
 
-- ansible.builtin.set_fact:
+- name: "Nomad | Nomad Token | Set fact for single mode install operations token"
+  ansible.builtin.set_fact:
     nomad_autoeligibility_token_facts: |
       {
         "nomad_autoeligibility_token": "{{ nomad_new_token_name.json.SecretID | default(nomad_autoeligibility_token) }}"
@@ -39,15 +40,16 @@
     marker: "#<!-- {mark} NOMAD AUTOELIGIBILITY TOKEN ANSIBLE MANAGED BLOCK -->"
     block: |
       nomad_autoeligibility_token: "{{ nomad_autoeligibility_token }}"
-    create: yes
+    create: true
+    mode: "0644"
   delegate_to: localhost
-  become: no
+  become: false
 
 - name: "Nomad Auto Eligibility | Install pip module"
   ansible.builtin.pip:
     name: "{{ item }}"
   loop:
-  - ansible
+    - ansible
 
 - name: "Nomad Auto Eligibility | Copy auto-autoeligibility playbook"
   ansible.builtin.template:

@@ -1,18 +1,31 @@
 ---
 - name: "Nomad | Transform to one line CA pem"
-  ansible.builtin.shell: "cat {{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_ca_pubkey }} | sed ':a;N;$!ba;s/\\n/\\\\n/g'"
+  ansible.builtin.shell: >
+    set -o pipefail && cat '{{ nomad_install_tls_host_certificate_dir }}/{{ nomad_install_tls_ca_pubkey }}' | sed ':a;N;$!ba;s/\n/\\n/g'
+  args:
+    executable: /bin/bash
   register: ca_certificate_output
-  when: nomad_tls == true
+  changed_when: ca_certificate_output.rc != 0
+  when: nomad_tls
 
 - name: "Nomad | Template for consul-auth-method-nomad-workloads.json"
   ansible.builtin.template:
     src: "consul-auth-method-nomad-workloads.json.j2"
-    dest: "/tmp/consul-auth-method-nomad-workloads.json"
+    dest: "/var/tmp/hashistack/consul/consul-auth-method-nomad-workloads.json"
+    mode: "0644"
+    owner: "root"
+    group: "root"
+  register: nomad_consul_auth_method_file
 
-- name: "Nomad | Create Auth Method"
-  ansible.builtin.shell: consul acl auth-method create -name '{{ nomad_install_backend_consul_jwt_name }}' -type 'jwt' -description '{{ nomad_install_backend_consul_jwt_description }}' -config '@consul-auth-method-nomad-workloads.json'
+- name: "Nomad_consul_auth_method_file"
+  ansible.builtin.shell: >
+    consul acl auth-method create
+    -name '{{ nomad_install_backend_consul_jwt_name }}'
+    -type 'jwt'
+    -description '{{ nomad_install_backend_consul_jwt_description }}'
+    -config '@consul-auth-method-nomad-workloads.json'
   args:
-    chdir: /tmp/
+    chdir: /var/tmp/hashistack/consul
   environment:
     CONSUL_HTTP_ADDR: "{{ nomad_install_backend_consul_http_ip }}:{{ nomad_install_backend_consul_http_port }}"
     CONSUL_HTTP_SSL: "{% if nomad_tls == true %}true{% else %}false{% endif %}"
@@ -20,11 +33,9 @@
     CONSUL_CACERT: "{% if nomad_tls == true %}{{ nomad_install_backend_consul_tls_host_certificate_dir }}/{{ nomad_install_backend_consul_tls_ca_pubkey }}{% endif %}"
     CONSUL_CLIENT_CERT: "{% if nomad_tls == true %}{{ nomad_install_backend_consul_tls_host_certificate_dir }}/{{ nomad_install_backend_consul_tls_cert_server }}{% endif %}"
     CONSUL_CLIENT_KEY: "{% if nomad_tls == true %}{{ nomad_install_backend_consul_tls_host_certificate_dir }}/{{ nomad_install_backend_consul_tls_privatekey_server }}{% endif %}"
-
-- name: "Nomad | Remove consul-auth-method-nomad-workloads.json"
-  ansible.builtin.file:
-    path: "/tmp/consul-auth-method-nomad-workloads.json"
-    state: absent
+  register: consul_auth_method_create
+  changed_when: consul_auth_method_create.rc != 0
+  when: nomad_consul_auth_method_file.changed
 
 - name: "Nomad | Create a Consul ACL binding rule for Nomad services"
   ansible.builtin.import_role:

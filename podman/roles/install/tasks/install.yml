@@ -1,39 +1,39 @@
 ---
 - name: Podman | Install requiered packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
-    update_cache: yes
+    update_cache: true
   loop:
-  - curl
-  - wget
-  - btrfs-progs
-  - git
-  - go-md2man
-  - iptables
-  - libassuan-dev
-  - libbtrfs-dev
-  - libc6-dev
-  - libdevmapper-dev
-  - libglib2.0-dev
-  - libgpgme-dev
-  - libgpg-error-dev
-  - libprotobuf-dev
-  - libprotobuf-c-dev
-  - libseccomp-dev
-  - libselinux1-dev
-  - libsystemd-dev
-  - pkg-config
-  - make
-  - libapparmor-dev
-  - gcc
-  - cmake
-  - uidmap
-  - libostree-dev
-  - slirp4netns
-  - dbus-user-session
-  - systemd-container
-  - fuse-overlayfs
-  - acl
+    - curl
+    - wget
+    - btrfs-progs
+    - git
+    - go-md2man
+    - iptables
+    - libassuan-dev
+    - libbtrfs-dev
+    - libc6-dev
+    - libdevmapper-dev
+    - libglib2.0-dev
+    - libgpgme-dev
+    - libgpg-error-dev
+    - libprotobuf-dev
+    - libprotobuf-c-dev
+    - libseccomp-dev
+    - libselinux1-dev
+    - libsystemd-dev
+    - pkg-config
+    - make
+    - libapparmor-dev
+    - gcc
+    - cmake
+    - uidmap
+    - libostree-dev
+    - slirp4netns
+    - dbus-user-session
+    - systemd-container
+    - fuse-overlayfs
+    - acl
 
 - name: Podman | Ensure br_netfilter is enabled.
   community.general.modprobe:
@@ -48,12 +48,13 @@
 - name: Podman | Install Go
   ansible.builtin.import_role:
     name: hashistack.go.install
-  when: go_installed.stat.exists == false
+  when: not go_installed.stat.exists
 
 - name: Podman | Git clone conmon
   ansible.builtin.git:
     repo: 'https://github.com/containers/conmon'
     dest: "/tmp/conmon"
+    version: HEAD
 
 - name: Podman | Make
   community.general.make:
@@ -88,20 +89,20 @@
 - name: Podman | Install runC
   ansible.builtin.import_role:
     name: hashistack.runc.install
-  when: runc_installed.stat.exists == false
+  when: not runc_installed.stat.exists
 
 - name: Podman | Install CNI plugin
   ansible.builtin.import_role:
     name: hashistack.cni.install
 
 - name: Podman | Create cni conf directory
-  file:
+  ansible.builtin.file:
     path: "/etc/cni/net.d"
     state: directory
     mode: '0755'
     owner: "{{ role_user }}"
     group: "{{ role_user }}"
-    recurse: yes
+    recurse: true
 
 - name: Podman | Download podman-bridge.conf to loopback.conf
   ansible.builtin.get_url:
@@ -112,34 +113,38 @@
     group: "{{ role_user }}"
 
 - name: Podman | Retreive GitHub latest version
-  uri:
+  ansible.builtin.uri:
     url: https://api.github.com/repos/containers/podman/releases/latest
     body_format: json
   register: tag
 
 - name: Podman | Unarchive Podman
   ansible.builtin.unarchive:
-    src: "https://github.com/containers/podman/archive/refs/tags/{{ tag.json.tag_name  }}.tar.gz"
+    src: "https://github.com/containers/podman/archive/refs/tags/{{ tag.json.tag_name }}.tar.gz"
     dest: "/tmp"
-    remote_src: yes
+    remote_src: true
 
 - name: Podman | Make
   ansible.builtin.command: make
   args:
-    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v','') }}"
+    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v', '') }}"
   environment:
     BUILDTAGS: "{{ podman_buildtags }}"
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/go/bin:/usr/local/go/bin"
+  register: make
+  changed_when: make.rc != 0
 
 - name: Podman | Make install
   ansible.builtin.command: make install
   args:
-    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v','') }}"
+    chdir: "/tmp/podman-{{ tag.json.tag_name | replace('v', '') }}"
   environment:
     BUILDTAGS: "{{ podman_buildtags }}"
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/go/bin:/usr/local/go/bin"
+  register: make_install
+  changed_when: make_install.rc != 0
 
 - name: Podman | Cleaning podman sources files
   ansible.builtin.file:
     state: absent
-    path: "/tmp/podman-{{ tag.json.tag_name | replace('v','') }}"
+    path: "/tmp/podman-{{ tag.json.tag_name | replace('v', '') }}"

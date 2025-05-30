@@ -15,6 +15,14 @@
     group: "root"
   when: hashistack_tls
 
+- name: "Hashistack | Commons tasks | Create temp conf and job directory"
+  ansible.builtin.file:
+    path: "/var/tmp/hashistack"
+    state: directory
+    mode: '0755'
+    owner: "root"
+    group: "root"
+
 - name: "Hashistack | Commons tasks | Create group {{ hashistack_group }}"
   ansible.builtin.group:
     name: "{{ hashistack_group }}"
@@ -34,10 +42,6 @@
   community.general.timezone:
     name: "{{ hashistack_timezone }}"
     hwclock: local
-
-- name: "Hashistack | Commons tasks | Update APT Cache"
-  ansible.builtin.apt:
-    update_cache: true
 
 - name: "Hashistack | Commons tasks | Install requiered OS packages"
   ansible.builtin.apt:

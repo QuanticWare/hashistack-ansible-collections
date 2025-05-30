@@ -1,2 +1,13 @@
 ---
 # handlers file for install
+
+- name: "Nomad_update_apt_cache"
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: "Nomad_restart"
+  ansible.builtin.systemd_service:
+    name: nomad
+    state: restarted
+    enabled: true
+    daemon_reload: true

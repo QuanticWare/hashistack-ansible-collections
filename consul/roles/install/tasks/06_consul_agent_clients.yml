@@ -1,21 +1,23 @@
-- block:
-    - name: "Consul Install | Copy base config file on clients nodes"
-      ansible.builtin.template:
-        src: "consul.hcl.j2"
-        dest: "{{ consul_conf_dir }}/consul.hcl"
-        owner: consul
-        group: consul
-        mode: '0644'
-
-    - name: "Consul Install | Copy tls config file on clients nodes"
-      ansible.builtin.template:
-        src: "tls.hcl.j2"
-        dest: "{{ consul_conf_dir }}/tls.hcl"
-        owner: consul
-        group: consul
-        mode: '0644'
-      when: consul_tls == true
+- name: "Consul Install | Copy base config file on clients nodes"
+  ansible.builtin.template:
+    src: "consul.hcl.j2"
+    dest: "{{ consul_conf_dir }}/consul.hcl"
+    owner: consul
+    group: consul
+    mode: '0644'
   when: consul_node_role == 'client'
+  register: consul_client_config_file
+
+- name: "Consul Install | Copy tls config file on clients nodes"
+  ansible.builtin.template:
+    src: "tls.hcl.j2"
+    dest: "{{ consul_conf_dir }}/tls.hcl"
+    owner: consul
+    group: consul
+    mode: '0644'
+  when:
+    - consul_tls
+    - consul_node_role == 'client'
 
 - name: "Consul Install | Start Consul on clients"
   ansible.builtin.systemd_service:
@@ -23,7 +25,9 @@
     name: consul
     enabled: true
     daemon_reload: true
-  when: consul_node_role == 'client'
+  when:
+    - consul_node_role == 'client'
+    - consul_client_config_file.changed
 
 - name: "Consul Install | Wait for Consul restarted on clients"
   ansible.builtin.wait_for:

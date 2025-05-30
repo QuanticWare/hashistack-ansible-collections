@@ -10,7 +10,7 @@
   ansible.builtin.pip:
     name: "{{ item }}"
   loop:
-  - ansible
+    - ansible
 
 - name: "Hashistack | Backup | Copy Backup playbook"
   ansible.builtin.template:

@@ -10,4 +10,4 @@
     headers:
       X-Consul-Token: "{% if consul_acl %}{{ consul_global_management_token | default(consul_master_token) }}"
     status_code:
-        - 200
+      - 200
